@@ -19,7 +19,18 @@
  *   Content-Type: text/markdown; charset=utf-8
  *   X-Markdown-Tokens: <byte-length of body>
  *   Vary: Accept
+ *   Link: (RFC 8288 agent-discovery relations — see LINK_HEADER below)
  *   + all security headers mirroring _headers /*
+ *
+ * RFC 8288 Link header (agent discovery)
+ * ───────────────────────────────────────
+ * Added to every homepage response (HTML and Markdown) so that AI agents
+ * and crawlers can discover machine-readable resources without parsing HTML.
+ * All relation types are IANA-registered:
+ *   describedby  — https://www.iana.org/assignments/link-relations
+ *   alternate    — https://www.iana.org/assignments/link-relations
+ *   sitemap      — https://www.iana.org/assignments/link-relations
+ *   robots-txt   — https://www.iana.org/assignments/link-relations
  */
 
 // ── Security header set ────────────────────────────────────────────────────
@@ -43,6 +54,20 @@ const SECURITY_HEADERS = {
     "base-uri 'self'; " +
     "form-action https://formspree.io",
 };
+
+// ── RFC 8288 Link header for agent / crawler discovery ─────────────────────
+// Applied to every homepage response (both HTML and Markdown paths).
+// Format: comma-separated link-values per RFC 8288 §3.
+const LINK_HEADER = [
+  // Primary machine-readable site description consumed by LLMs/AI agents
+  '</llms.txt>; rel="describedby"; type="text/markdown"',
+  // Alternate markdown representation of the homepage (content negotiation)
+  '</llms.txt>; rel="alternate"; type="text/markdown"',
+  // Sitemap for structured site discovery
+  '</sitemap.xml>; rel="sitemap"; type="application/xml"',
+  // Crawl policy
+  '</robots.txt>; rel="robots-txt"',
+].join(", ");
 
 export default {
   async fetch(request, env) {
@@ -71,6 +96,8 @@ export default {
             "X-Markdown-Tokens": String(byteLength),
             "Vary": "Accept",
             "Cache-Control": "public, max-age=3600, stale-while-revalidate=86400",
+            // RFC 8288 agent-discovery link relations
+            "Link": LINK_HEADER,
             // Full security header set — must mirror _headers /*
             ...SECURITY_HEADERS,
           },
@@ -87,9 +114,10 @@ export default {
 
     if (isRootPage) {
       // Clone headers (which already include all _headers /* security rules)
-      // and add Vary without removing anything.
+      // and add Vary + Link without removing anything.
       const newHeaders = new Headers(response.headers);
       newHeaders.set("Vary", "Accept");
+      newHeaders.set("Link", LINK_HEADER);
       return new Response(response.body, {
         status: response.status,
         statusText: response.statusText,
