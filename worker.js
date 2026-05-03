@@ -3,13 +3,46 @@
  *
  * Content negotiation: requests with Accept: text/markdown (AI agents)
  * on "/" or "/index.html" receive the pre-built llms.txt as a Markdown
- * response.  All other requests (browsers) fall through to static assets.
+ * response.  All other requests (browsers) fall through to static assets
+ * unchanged — security headers from _headers are preserved in both paths.
  *
- * Response headers set:
+ * Security note
+ * ─────────────
+ * When run_worker_first = true, Cloudflare no longer auto-applies _headers
+ * rules to hand-built Response objects returned by the worker.  Any branch
+ * that calls `new Response(...)` directly must re-apply the full /*
+ * security header set explicitly.  Branches that return the response from
+ * env.ASSETS.fetch() unmodified (or with only header additions) receive
+ * the _headers rules automatically from the runtime.
+ *
+ * Response headers for text/markdown path:
  *   Content-Type: text/markdown; charset=utf-8
- *   X-Markdown-Tokens: <byte-length of body>   (agent hint)
- *   Vary: Accept                                 (correct CDN caching)
+ *   X-Markdown-Tokens: <byte-length of body>
+ *   Vary: Accept
+ *   + all security headers mirroring _headers /*
  */
+
+// ── Security header set ────────────────────────────────────────────────────
+// Must stay in sync with the /* block in _headers.
+// These are applied to every hand-built Response so no path is left unguarded.
+const SECURITY_HEADERS = {
+  "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
+  "X-Frame-Options": "DENY",
+  "X-Content-Type-Options": "nosniff",
+  "X-XSS-Protection": "1; mode=block",
+  "Referrer-Policy": "strict-origin-when-cross-origin",
+  "Permissions-Policy": "camera=(), microphone=(), geolocation=(), payment=()",
+  "Content-Security-Policy":
+    "default-src 'self'; " +
+    "script-src 'self'; " +
+    "style-src 'self' https://fonts.googleapis.com https://cdnjs.cloudflare.com; " +
+    "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; " +
+    "img-src 'self' data: https://images.unsplash.com https://hits.sh; " +
+    "connect-src 'self' https://formspree.io; " +
+    "frame-ancestors 'none'; " +
+    "base-uri 'self'; " +
+    "form-action https://formspree.io",
+};
 
 export default {
   async fetch(request, env) {
@@ -17,15 +50,12 @@ export default {
     const accept = request.headers.get("Accept") ?? "";
     const path = url.pathname;
 
-    // ── Content negotiation ────────────────────────────────────────────────
-    // Trigger on "/" or "/index.html" when the client prefers text/markdown.
-    // We also honour a direct fetch of "/llms.txt" so it always works.
     const isRootPage =
       path === "/" || path === "/index.html" || path === "/index";
     const wantsMarkdown = accept.includes("text/markdown");
 
+    // ── Markdown path (AI agents) ──────────────────────────────────────────
     if (isRootPage && wantsMarkdown) {
-      // Fetch llms.txt from the asset binding (served as a static file)
       const mdRequest = new Request(new URL("/llms.txt", url.origin));
       const mdResponse = await env.ASSETS.fetch(mdRequest);
 
@@ -36,23 +66,28 @@ export default {
         return new Response(body, {
           status: 200,
           headers: {
+            // Content negotiation headers
             "Content-Type": "text/markdown; charset=utf-8",
             "X-Markdown-Tokens": String(byteLength),
             "Vary": "Accept",
-            // Preserve security headers already set by _headers for /*
             "Cache-Control": "public, max-age=3600, stale-while-revalidate=86400",
+            // Full security header set — must mirror _headers /*
+            ...SECURITY_HEADERS,
           },
         });
       }
+      // If llms.txt is somehow missing, fall through to normal asset serving.
     }
 
-    // ── Default: pass through to static assets ─────────────────────────────
-    // The ASSETS binding serves index.html, index.css, logo.png, etc.
+    // ── Browser / default path ─────────────────────────────────────────────
+    // env.ASSETS.fetch() serves the static file AND applies _headers rules,
+    // so security headers arrive automatically. We only inject Vary: Accept
+    // on the root to ensure caches store HTML and Markdown variants separately.
     const response = await env.ASSETS.fetch(request);
 
-    // Attach Vary: Accept to the root HTML response so the CDN caches
-    // HTML and Markdown variants separately.
     if (isRootPage) {
+      // Clone headers (which already include all _headers /* security rules)
+      // and add Vary without removing anything.
       const newHeaders = new Headers(response.headers);
       newHeaders.set("Vary", "Accept");
       return new Response(response.body, {
