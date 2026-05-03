@@ -1,7 +1,11 @@
 name = 'kecpa'
 compatibility_date = "2026-04-22"
+main = "worker.js"
 
-# Serve static files via Cloudflare Workers Assets
-# No worker script needed — assets are served directly at the edge.
+# Static assets are served via the ASSETS binding.
+# The worker script intercepts requests first and falls through to ASSETS
+# for all normal browser traffic. AI agents sending Accept: text/markdown
+# on "/" receive llms.txt with Content-Type: text/markdown instead.
 [assets]
 directory = "./"
+binding = "ASSETS"
