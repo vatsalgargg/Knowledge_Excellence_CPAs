@@ -3,9 +3,11 @@ compatibility_date = "2026-04-22"
 main = "worker.js"
 
 # Static assets are served via the ASSETS binding.
-# The worker script intercepts requests first and falls through to ASSETS
-# for all normal browser traffic. AI agents sending Accept: text/markdown
-# on "/" receive llms.txt with Content-Type: text/markdown instead.
+# run_worker_first = true ensures the worker script is ALWAYS invoked
+# before Cloudflare serves any static asset directly. Without this flag,
+# requests matching an asset path (e.g. "/" → index.html) bypass the worker
+# entirely, breaking Accept-header content negotiation.
 [assets]
 directory = "./"
 binding = "ASSETS"
+run_worker_first = true
