@@ -83,7 +83,7 @@ img{max-width:100%;height:auto;display:block;}
 .hero-bg-mesh{position:absolute;inset:0;background:radial-gradient(ellipse 60% 50% at 80% 50%,rgba(30,58,110,0.07) 0%,transparent 70%);pointer-events:none;}
 .hero-grid{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;padding:20px 0;}
 .hero-badge{display:inline-flex;align-items:center;gap:0.5rem;background:rgba(184,134,11,0.1);border:1px solid var(--border-gold);color:var(--gold);font-size:clamp(0.68rem,1.2vw,0.8rem);font-weight:600;letter-spacing:0.06em;text-transform:uppercase;padding:0.45rem 1rem;border-radius:50px;margin-bottom:1.5rem;text-wrap:balance;}
-.hero-title{font-size:clamp(1.75rem,4vw,2.8rem);color:var(--navy);margin-bottom:1.25rem;letter-spacing:-0.02em;text-wrap:balance;overflow-wrap:break-word;}
+.hero-title{font-size:clamp(1.1rem,calc(0.5rem + 3.2vw),2.8rem);color:var(--navy);margin-bottom:1.25rem;letter-spacing:-0.02em;overflow-wrap:break-word;}
 .title-gold{color:var(--gold);}
 /* Mobile-only line break in hero title — hidden on desktop */
 .hero-br{display:none;}
@@ -248,8 +248,7 @@ img{max-width:100%;height:auto;display:block;}
   .section{padding:60px 0;}
   .hero{padding-top:70px;}
   .hero-grid{gap:2rem;}
-  /* clamp() handles fluid scaling — these are now safety overrides only */
-  .hero-title{font-size:clamp(1.6rem,5vw,2.2rem);}
+  /* hero-title uses calc-based clamp — no override needed */
   .hero-subtitle{font-size:clamp(0.92rem,2vw,1rem);}
   .section-title{font-size:clamp(1.5rem,4vw,1.9rem);}
   .cta-title{font-size:clamp(1.5rem,4vw,1.9rem);}
@@ -289,7 +288,7 @@ img{max-width:100%;height:auto;display:block;}
   .about-feature{padding:1rem;}
 }
 @media(max-width:480px){
-  .hero-title{font-size:clamp(1.4rem,6vw,1.75rem);}
+  /* hero-title: calc-based clamp auto-scales, no override needed */
   .section-title{font-size:clamp(1.3rem,5vw,1.6rem);}
   .contact-form-container{padding:1.5rem 1.1rem;}
   .stats-grid{grid-template-columns:1fr;}
