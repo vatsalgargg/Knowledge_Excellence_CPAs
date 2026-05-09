@@ -82,7 +82,7 @@ img{max-width:100%;height:auto;display:block;}
 .hero{min-height:100vh;display:flex;align-items:center;padding-top:72px;background:linear-gradient(135deg,var(--off-white) 0%,#eef3ff 100%);position:relative;overflow:hidden;}
 .hero-bg-mesh{position:absolute;inset:0;background:radial-gradient(ellipse 60% 50% at 80% 50%,rgba(30,58,110,0.07) 0%,transparent 70%);pointer-events:none;}
 .hero-grid{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;padding:20px 0;}
-.hero-badge{display:inline-flex;align-items:center;gap:0.5rem;background:rgba(184,134,11,0.1);border:1px solid var(--border-gold);color:var(--gold);font-size:0.8rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;padding:0.45rem 1rem;border-radius:50px;margin-bottom:1.5rem;}
+.hero-badge{display:inline-flex;align-items:center;gap:0.5rem;background:rgba(184,134,11,0.1);border:1px solid var(--border-gold);color:var(--gold);font-size:clamp(0.68rem,1.2vw,0.8rem);font-weight:600;letter-spacing:0.06em;text-transform:uppercase;padding:0.45rem 1rem;border-radius:50px;margin-bottom:1.5rem;text-wrap:balance;}
 .hero-title{font-size:clamp(1.75rem,4vw,2.8rem);color:var(--navy);margin-bottom:1.25rem;letter-spacing:-0.02em;text-wrap:balance;overflow-wrap:break-word;}
 .title-gold{color:var(--gold);}
 .hero-subtitle{font-size:clamp(0.95rem,1.8vw,1.1rem);color:var(--text-mid);margin-bottom:2rem;max-width:500px;line-height:1.75;}
@@ -273,8 +273,8 @@ img{max-width:100%;height:auto;display:block;}
   .stat-item{border-bottom:1px solid rgba(255,255,255,0.12);padding:1rem 1.5rem;}
   .hero-actions{flex-direction:column;}
   .hero-actions .btn{width:100%;justify-content:center;}
-  /* Hero badge: allow long text to wrap on mobile */
-  .hero-badge{white-space:normal;text-align:center;justify-content:center;max-width:100%;}
+  /* Hero badge: reduce spacing so long text fits better */
+  .hero-badge{white-space:normal;text-align:center;justify-content:center;max-width:100%;letter-spacing:0.03em;font-size:clamp(0.65rem,2.2vw,0.78rem);}
   /* Trust badges wrap nicely on mobile */
   .trust-badges{gap:0.5rem;}
   .trust-badge{font-size:0.75rem;padding:0.3rem 0.7rem;}
@@ -289,7 +289,7 @@ img{max-width:100%;height:auto;display:block;}
   .section-title{font-size:clamp(1.3rem,5vw,1.6rem);}
   .contact-form-container{padding:1.5rem 1.1rem;}
   .stats-grid{grid-template-columns:1fr;}
-  .hero-badge{font-size:0.7rem;padding:0.4rem 0.85rem;}
+  .hero-badge{font-size:clamp(0.6rem,3vw,0.7rem);padding:0.4rem 0.75rem;letter-spacing:0.01em;}
   .section{padding:50px 0;}
   .stats-banner{padding:40px 0;}
   .services-grid{gap:1.2rem;}
