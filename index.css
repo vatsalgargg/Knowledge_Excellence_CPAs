@@ -244,8 +244,10 @@ img{max-width:100%;height:auto;display:block;}
 }
 @media(max-width:768px){
   .section{padding:60px 0;}
-  .hero{padding-top:80px;}
-  .hero-title{font-size:2.3rem;}
+  .hero{padding-top:70px;}
+  .hero-grid{gap:2rem;}
+  .hero-title{font-size:2.2rem;}
+  .hero-subtitle{font-size:1rem;}
   .section-title{font-size:1.9rem;}
   .cta-title{font-size:1.9rem;}
   /* Mobile nav — smooth reveal */
@@ -265,28 +267,36 @@ img{max-width:100%;height:auto;display:block;}
   .form-row{grid-template-columns:1fr;}
   .footer-grid{grid-template-columns:1fr;}
   .footer-bottom-inner{flex-direction:column;text-align:center;}
-  .stats-grid{grid-template-columns:1fr 1fr;}
+  /* Collapse to single column so long stat label doesn't get squished */
+  .stats-grid{grid-template-columns:1fr;}
+  .stat-item{border-bottom:1px solid rgba(255,255,255,0.12);padding:1rem 1.5rem;}
   .hero-actions{flex-direction:column;}
   .hero-actions .btn{width:100%;justify-content:center;}
+  /* Hero badge: allow long text to wrap on mobile */
+  .hero-badge{white-space:normal;text-align:center;justify-content:center;max-width:100%;}
   /* Trust badges wrap nicely on mobile */
   .trust-badges{gap:0.5rem;}
   .trust-badge{font-size:0.75rem;padding:0.3rem 0.7rem;}
-  /* Process cards full width — number is absolute, no overlap possible */
+  /* Process cards full width */
   .process-step{padding:2rem 1.5rem;}
   .process-step-number{font-size:3rem;top:0.75rem;right:1rem;}
   /* About features compact */
   .about-feature{padding:1rem;}
 }
 @media(max-width:480px){
-  .hero-title{font-size:1.9rem;}
-  .section-title{font-size:1.65rem;}
+  .hero-title{font-size:1.75rem;}
+  .section-title{font-size:1.6rem;}
   .contact-form-container{padding:1.5rem 1.1rem;}
   .stats-grid{grid-template-columns:1fr;}
-  .hero-badge{font-size:0.72rem;padding:0.4rem 0.8rem;}
+  .hero-badge{font-size:0.7rem;padding:0.4rem 0.85rem;}
   .section{padding:50px 0;}
-  .stats-banner{padding:48px 0;}
+  .stats-banner{padding:40px 0;}
   .services-grid{gap:1.2rem;}
   .service-card{padding:1.5rem;}
+  .cta-title{font-size:1.6rem;}
+  .hero-subtitle{font-size:0.95rem;}
+  .section-subtitle{font-size:0.95rem;}
+  .btn{font-size:0.9rem;padding:0.7rem 1.4rem;}
 }
 
 /* ============================================
