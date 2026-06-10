@@ -19,3 +19,8 @@
 /llms.txt
   Content-Type: text/markdown; charset=utf-8
   Cache-Control: public, max-age=3600, stale-while-revalidate=86400
+
+# Vulnerability disclosure metadata (RFC 9116).
+/.well-known/security.txt
+  Content-Type: text/plain; charset=utf-8
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800

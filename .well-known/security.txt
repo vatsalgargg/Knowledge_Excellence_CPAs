@@ -1,0 +1,5 @@
+Contact: mailto:support@knowledgeexcellencecpa.com
+Contact: https://knowledgeexcellencecpa.com/#contact
+Preferred-Languages: en
+Canonical: https://knowledgeexcellencecpa.com/.well-known/security.txt
+Expires: 2027-06-09T00:00:00Z

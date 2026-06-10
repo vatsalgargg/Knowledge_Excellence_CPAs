@@ -1,5 +1,6 @@
 /index.html / 301
 /favicon.ico /logo.png 301
+/security.txt /.well-known/security.txt 301
 /home /#home 301
 /about /#about 301
 /services /#services 301

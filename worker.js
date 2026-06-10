@@ -31,6 +31,7 @@
  *   alternate    — https://www.iana.org/assignments/link-relations
  *   sitemap      — https://www.iana.org/assignments/link-relations
  *   robots-txt   — https://www.iana.org/assignments/link-relations
+ *   security     — https://www.iana.org/assignments/link-relations
  */
 
 // ── Security header set ────────────────────────────────────────────────────
@@ -67,6 +68,8 @@ const LINK_HEADER = [
   '</sitemap.xml>; rel="sitemap"; type="application/xml"',
   // Crawl policy
   '</robots.txt>; rel="robots-txt"',
+  // Vulnerability disclosure contact metadata
+  '</.well-known/security.txt>; rel="security"; type="text/plain"',
 ].join(", ");
 
 export default {

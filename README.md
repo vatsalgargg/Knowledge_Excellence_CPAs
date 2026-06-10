@@ -18,6 +18,7 @@ Static website for **[knowledgeexcellencecpa.com](https://knowledgeexcellencecpa
 | `logo.png` | Brand logo |
 | `sitemap.xml` | SEO sitemap |
 | `robots.txt` | Search engine directives |
+| `.well-known/security.txt` | Vulnerability disclosure contact metadata |
 | `_headers` | Cloudflare security headers (CSP, HSTS, etc.) |
 | `wrangler.toml` | Cloudflare Pages deployment config |
 
