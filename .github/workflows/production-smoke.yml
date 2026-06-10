@@ -72,7 +72,16 @@ jobs:
             exit 1
           fi
 
-          grep -qi '^location: /.well-known/security.txt' "$headers"
+          location=$(awk 'tolower($1) == "location:" { print $2 }' "$headers" | tr -d '\r')
+          case "$location" in
+            "/.well-known/security.txt"|"${SITE_URL}/.well-known/security.txt")
+              ;;
+            *)
+              echo "/security.txt redirected to unexpected location: $location"
+              cat "$headers"
+              exit 1
+              ;;
+          esac
 
           echo "/security.txt redirects to /.well-known/security.txt"
 
