@@ -1,0 +1,84 @@
+name: Production Smoke Test
+
+on:
+  workflow_run:
+    workflows: ["Validate Static Site"]
+    types: [completed]
+    branches: [main]
+  schedule:
+    - cron: "27 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-smoke
+  cancel-in-progress: false
+
+jobs:
+  smoke:
+    name: Smoke live site
+    runs-on: ubuntu-latest
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+
+    env:
+      SITE_URL: https://knowledgeexcellencecpa.com
+
+    steps:
+      - name: Wait for Cloudflare deployment
+        if: github.event_name == 'workflow_run'
+        run: sleep 90
+
+      - name: Check homepage headers
+        run: |
+          headers=$(mktemp)
+          body=$(mktemp)
+
+          curl --silent --show-error --location --dump-header "$headers" --output "$body" "$SITE_URL/"
+
+          grep -qi '^strict-transport-security:' "$headers"
+          grep -qi '^content-security-policy:' "$headers"
+          grep -qi '^x-content-type-options: nosniff' "$headers"
+          grep -qi '^link: .*\.well-known/security\.txt' "$headers"
+          grep -qi 'Knowledge Excellence CPAs' "$body"
+
+          echo "Homepage is reachable and security headers are present"
+
+      - name: Check security.txt
+        run: |
+          headers=$(mktemp)
+          body=$(mktemp)
+
+          curl --silent --show-error --dump-header "$headers" --output "$body" "$SITE_URL/.well-known/security.txt"
+
+          grep -qi '^content-type: text/plain' "$headers"
+          grep -q '^Contact: mailto:support@knowledgeexcellencecpa.com$' "$body"
+          grep -q '^Canonical: https://knowledgeexcellencecpa.com/\.well-known/security\.txt$' "$body"
+          grep -q '^Expires: ' "$body"
+
+          echo "security.txt is reachable"
+
+      - name: Check security.txt redirect
+        run: |
+          headers=$(mktemp)
+
+          curl --silent --show-error --dump-header "$headers" --output /dev/null "$SITE_URL/security.txt"
+
+          status=$(awk 'NR == 1 { print $2 }' "$headers")
+          if [ "$status" != "301" ] && [ "$status" != "302" ] && [ "$status" != "308" ]; then
+            echo "/security.txt returned $status instead of a redirect"
+            cat "$headers"
+            exit 1
+          fi
+
+          grep -qi '^location: /.well-known/security.txt' "$headers"
+
+          echo "/security.txt redirects to /.well-known/security.txt"
+
+      - name: Check robots and sitemap
+        run: |
+          curl --silent --show-error --fail "$SITE_URL/robots.txt" | grep -q '^Sitemap: https://knowledgeexcellencecpa.com/sitemap.xml$'
+          curl --silent --show-error --fail "$SITE_URL/sitemap.xml" | grep -q '<loc>https://knowledgeexcellencecpa.com/</loc>'
+
+          echo "robots.txt and sitemap.xml are reachable"

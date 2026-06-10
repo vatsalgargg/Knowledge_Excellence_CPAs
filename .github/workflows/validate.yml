@@ -5,34 +5,121 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   validate:
-    name: Validate Files
+    name: Validate static site
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
       - name: Check required files exist
         run: |
-          files=("index.html" "index.css" "script.js" "sitemap.xml" "robots.txt")
-          for f in "${files[@]}"; do
-            if [ ! -f "$f" ]; then
-              echo "MISSING: $f"
+          files=(
+            "index.html"
+            "index.css"
+            "script.js"
+            "worker.js"
+            "wrangler.toml"
+            "_headers"
+            "_redirects"
+            "sitemap.xml"
+            "robots.txt"
+            ".well-known/security.txt"
+          )
+
+          for file in "${files[@]}"; do
+            if [ ! -f "$file" ]; then
+              echo "Missing required file: $file"
               exit 1
             fi
-            echo "OK: $f"
+            echo "Found: $file"
           done
 
-      - name: Check JS syntax
-        run: node --check script.js && echo "JS syntax OK"
+      - name: Check JavaScript syntax
+        run: |
+          node --check script.js
+          node --check worker.js
 
-      - name: Check HTML is not empty
+      - name: Check HTML metadata
         run: |
           size=$(wc -c < index.html)
           if [ "$size" -lt 1000 ]; then
             echo "index.html looks too small: $size bytes"
             exit 1
           fi
-          echo "index.html size OK: $size bytes"
+
+          grep -qi '<title>.*Knowledge Excellence CPAs' index.html
+          grep -qi 'name="description"' index.html
+          grep -qi 'rel="canonical"' index.html
+
+          echo "index.html metadata looks valid"
+
+      - name: Check Cloudflare config
+        run: |
+          grep -q '^main = "worker.js"$' wrangler.toml
+          grep -q '^\[assets\]$' wrangler.toml
+          grep -q '^directory = "\./"$' wrangler.toml
+          grep -q '^binding = "ASSETS"$' wrangler.toml
+          grep -q '^run_worker_first = true$' wrangler.toml
+
+          grep -q 'Strict-Transport-Security:' _headers
+          grep -q 'Content-Security-Policy:' _headers
+          grep -q '^/\.well-known/security\.txt$' _headers
+          grep -q '^/security\.txt /\.well-known/security\.txt 301$' _redirects
+
+          echo "Cloudflare config looks valid"
+
+      - name: Check security.txt
+        run: |
+          security_file=".well-known/security.txt"
+
+          grep -q '^Contact: mailto:' "$security_file"
+          grep -q '^Canonical: https://knowledgeexcellencecpa.com/\.well-known/security\.txt$' "$security_file"
+          grep -q '^Expires: ' "$security_file"
+          grep -q '^Preferred-Languages: ' "$security_file"
+
+          expires=$(awk '/^Expires: / {print $2}' "$security_file")
+          python3 - "$expires" <<'PY'
+          import datetime
+          import sys
+
+          value = sys.argv[1].replace("Z", "+00:00")
+          expires = datetime.datetime.fromisoformat(value)
+          now = datetime.datetime.now(datetime.timezone.utc)
+
+          if expires <= now:
+              raise SystemExit("security.txt Expires value is in the past")
+          PY
+
+          echo "security.txt looks valid"
+
+      - name: Check robots and sitemap
+        run: |
+          grep -q '^User-agent: \*$' robots.txt
+          grep -q '^Sitemap: https://knowledgeexcellencecpa.com/sitemap.xml$' robots.txt
+
+          python3 - <<'PY'
+          import xml.etree.ElementTree as ET
+
+          tree = ET.parse("sitemap.xml")
+          root = tree.getroot()
+          namespace = {"sm": "http://www.sitemaps.org/schemas/sitemap/0.9"}
+          locs = [loc.text for loc in root.findall(".//sm:loc", namespace)]
+
+          if "https://knowledgeexcellencecpa.com/" not in locs:
+              raise SystemExit("sitemap.xml does not include the production homepage")
+          PY
+
+          echo "robots.txt and sitemap.xml look valid"

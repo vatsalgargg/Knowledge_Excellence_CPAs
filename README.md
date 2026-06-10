@@ -25,3 +25,11 @@ Static website for **[knowledgeexcellencecpa.com](https://knowledgeexcellencecpa
 ## Deploy
 
 Cloudflare Pages auto-deploys on every push to `main`.
+
+## CI/CD
+
+GitHub Actions validates pull requests and pushes to `main` through `.github/workflows/validate.yml`.
+
+Cloudflare remains the only deployment system. Do not add a GitHub Actions deploy workflow unless Cloudflare Git deployments are intentionally disabled first.
+
+After validation completes on `main`, `.github/workflows/production-smoke.yml` checks the live production site for the homepage, security headers, `security.txt`, `robots.txt`, and `sitemap.xml`.
