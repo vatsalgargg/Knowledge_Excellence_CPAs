@@ -1,7 +1,25 @@
 if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 window.addEventListener('pageshow', () => window.scrollTo({ top: 0, behavior: 'instant' }));
 
+// ── Fast Page Loader Dismissal (CSP Compliant) ───────────────────────────
+function dismissLoader() {
+  const loader = document.getElementById('pageLoader');
+  if (!loader || loader.classList.contains('loader-done')) return;
+  loader.classList.add('loader-done');
+  setTimeout(() => {
+    try { loader.remove(); } catch (_) {}
+  }, 450);
+}
+
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
+  dismissLoader();
+} else {
+  document.addEventListener('DOMContentLoaded', dismissLoader, { once: true });
+  window.addEventListener('load', dismissLoader, { once: true });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+  dismissLoader();
   window.scrollTo({ top: 0, behavior: 'instant' });
 
   // ── Security Logger ──────────────────────────────────────────────────────

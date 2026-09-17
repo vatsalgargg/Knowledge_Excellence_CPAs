@@ -17,7 +17,7 @@
 .page-loader {
   position: fixed;
   inset: 0;
-  z-index: 9999;
+  z-index: 99999;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -26,12 +26,19 @@
     linear-gradient(#13272d0d 1px, transparent 1px),
     linear-gradient(90deg, #13272d0d 1px, transparent 1px);
   background-size: clamp(2.5rem,5vw,4.5rem) clamp(2.5rem,5vw,4.5rem);
-  transition: opacity 0.55s var(--ease), visibility 0.55s var(--ease);
+  transition: opacity 0.4s var(--ease), visibility 0.4s var(--ease);
+  animation: loader-safety-dismiss 1.8s ease-out forwards;
 }
+
+@keyframes loader-safety-dismiss {
+  0%, 75% { opacity: 1; visibility: visible; }
+  100% { opacity: 0; visibility: hidden; pointer-events: none; }
+}
+
 .page-loader.loader-done {
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
 }
 
 .loader-inner {

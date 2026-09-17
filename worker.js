@@ -128,6 +128,18 @@ export default {
       });
     }
 
+    if (response.status === 404) {
+      const notFoundReq = new Request(new URL("/404.html", url.origin));
+      const notFoundRes = await env.ASSETS.fetch(notFoundReq);
+      if (notFoundRes.ok) {
+        return new Response(notFoundRes.body, {
+          status: 404,
+          statusText: "Not Found",
+          headers: notFoundRes.headers,
+        });
+      }
+    }
+
     return response;
   },
 };
