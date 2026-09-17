@@ -92,6 +92,24 @@
 </head>
 
 <body>
+    <!-- PAGE LOADER -->
+    <div class="page-loader" id="pageLoader" aria-hidden="true">
+      <div class="loader-inner">
+        <div class="loader-ring loader-ring--outer"></div>
+        <div class="loader-ring loader-ring--inner"></div>
+        <div class="loader-emblem">
+          <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <!-- K letterform -->
+            <line x1="12" y1="8" x2="12" y2="32" stroke="#b5542e" stroke-width="3" stroke-linecap="round"/>
+            <line x1="12" y1="20" x2="28" y2="8"  stroke="#b5542e" stroke-width="3" stroke-linecap="round"/>
+            <line x1="12" y1="20" x2="28" y2="32" stroke="#b5542e" stroke-width="3" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <p class="loader-wordmark">Knowledge Excellence<span>CPAs</span></p>
+        <div class="loader-bar-track"><div class="loader-bar"></div></div>
+      </div>
+    </div>
+
     <a class="skip-link" href="#main-content">Skip to content</a>
     <div class="reading-progress" aria-hidden="true"></div>
 
@@ -526,6 +544,29 @@
         </div>
     </footer>
 
+    <!-- Loader dismiss -->
+    <script>
+      (function () {
+        var loader = document.getElementById('pageLoader');
+        function dismissLoader() {
+          if (!loader) return;
+          // Small grace so the bar animation finishes before fading out
+          setTimeout(function () {
+            loader.classList.add('loader-done');
+            loader.addEventListener('transitionend', function () {
+              loader.remove();
+            }, { once: true });
+          }, 300);
+        }
+        if (document.readyState === 'complete') {
+          dismissLoader();
+        } else {
+          window.addEventListener('load', dismissLoader, { once: true });
+          // Hard fallback — never block the user longer than 2.5s
+          setTimeout(dismissLoader, 2500);
+        }
+      })();
+    </script>
     <script type="module" src="script.js"></script>
 </body>
 
