@@ -1,0 +1,48 @@
+:root { --paper:#f5f2eb; --ink:#13272d; --navy:#102a34; --copper:#b5542e; --muted:#616968; --line:#d7d7cd; --sans:Inter,Arial,sans-serif; --serif:"Playfair Display",Georgia,serif; }
+    * { box-sizing:border-box; }
+    html { min-height:100%; }
+    body { min-height:100vh; margin:0; color:var(--ink); background-color:var(--paper); background-image:linear-gradient(#13272d0d 1px,transparent 1px),linear-gradient(90deg,#13272d0d 1px,transparent 1px); background-size:clamp(2.5rem,5vw,4.5rem) clamp(2.5rem,5vw,4.5rem); font:400 16px/1.6 var(--sans); -webkit-font-smoothing:antialiased; }
+    a { color:inherit; text-decoration:none; }
+    .shell { width:min(100% - 40px,1160px); margin-inline:auto; }
+    .site-header { border-bottom:1px solid var(--line); background:#f5f2ebeb; }
+    .header-inner { min-height:82px; display:flex; align-items:center; justify-content:space-between; gap:24px; }
+    .brand { display:inline-flex; align-items:center; gap:11px; }
+    .brand img { width:42px; height:42px; border-radius:4px; object-fit:contain; background:#fff; }
+    .brand-name { display:grid; line-height:1.15; }
+    .brand-name strong { font-size:15px; font-weight:600; letter-spacing:-.02em; }
+    .brand-name span { margin-top:3px; color:var(--copper); font-size:11px; font-weight:600; letter-spacing:.12em; text-transform:uppercase; }
+    .return-link { color:var(--navy); font-size:13px; font-weight:600; }
+    .return-link::before { content:"←"; margin-right:8px; color:var(--copper); }
+    .return-link:hover,.return-link:focus-visible { color:var(--copper); }
+    main { min-height:calc(100vh - 148px); display:grid; align-items:center; padding-block:clamp(4rem,10vw,8rem); }
+    .error-layout { display:grid; grid-template-columns:minmax(0,1fr) minmax(17rem,25rem); gap:clamp(2.5rem,7vw,8rem); align-items:center; }
+    .eyebrow { margin:0 0 18px; color:var(--copper); font-size:11px; font-weight:600; letter-spacing:.16em; text-transform:uppercase; }
+    h1 { max-width:12ch; margin:0; color:var(--navy); font:400 clamp(3rem,6vw,5.5rem)/.98 var(--serif); letter-spacing:-.055em; }
+    .lead { max-width:34rem; margin:26px 0 0; color:var(--muted); font-size:clamp(1rem,.9rem + .25vw,1.125rem); }
+    .actions { display:flex; flex-wrap:wrap; gap:12px; margin-top:32px; }
+    .button { min-height:46px; display:inline-flex; align-items:center; justify-content:center; padding:11px 18px; border:1px solid var(--navy); border-radius:3px; font-size:13px; font-weight:600; transition:background-color .18s ease,color .18s ease,border-color .18s ease; }
+    .button-primary { background:var(--navy); color:var(--paper); }
+    .button-primary:hover,.button-primary:focus-visible { background:var(--copper); border-color:var(--copper); }
+    .button-secondary { background:transparent; color:var(--navy); }
+    .button-secondary:hover,.button-secondary:focus-visible { background:#fff; }
+    .reference { padding:clamp(1.5rem,3vw,2.25rem); border-top:2px solid var(--navy); border-bottom:1px solid var(--line); background:#f5f2ebe6; }
+    .reference-code { color:var(--copper); font:400 clamp(5rem,11vw,8.5rem)/.8 var(--serif); letter-spacing:-.08em; }
+    .reference h2 { margin:26px 0 8px; font:400 1.55rem/1.2 var(--serif); }
+    .reference p { margin:0; color:var(--muted); font-size:14px; }
+    .reference nav { margin-top:24px; }
+    .reference ul { display:grid; gap:10px; margin:0; padding:0; list-style:none; }
+    .reference li a { display:flex; align-items:center; justify-content:space-between; min-height:38px; padding-bottom:10px; border-bottom:1px solid var(--line); color:var(--navy); font-size:13px; font-weight:500; }
+    .reference li a::after { content:"→"; color:var(--copper); }
+    .reference li a:hover,.reference li a:focus-visible { color:var(--copper); }
+    footer { min-height:66px; display:flex; align-items:center; border-top:1px solid var(--line); color:var(--muted); font-size:12px; }
+    @media (max-width:720px) {
+      .shell { width:min(100% - 32px,1160px); }
+      .header-inner { min-height:74px; }
+      .brand-name strong { font-size:14px; }
+      .return-link { font-size:12px; white-space:nowrap; }
+      main { padding-block:3rem; }
+      .error-layout { grid-template-columns:1fr; gap:3rem; }
+      h1 { max-width:10ch; }
+      .actions { display:grid; grid-template-columns:1fr; }
+      .button { width:100%; }
+    }
