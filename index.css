@@ -1067,7 +1067,7 @@ a,button {
   line-height: 1.85;
   max-width: 450px;
   margin: 0 auto 30px;
-  color: #4d4d42;
+  color: #46463d;
 }
 .cta-orbits {
   position: absolute;
@@ -1135,7 +1135,7 @@ a,button {
   color: var(--copper);
 }
 .contact-label {
-  font-size: 9px;
+  font-size: 12px;
   letter-spacing: .12em;
   text-transform: uppercase;
   color: var(--muted);
@@ -1146,7 +1146,7 @@ a,button {
   flex-wrap: wrap;
   gap: 15px;
   margin-top: 35px;
-  font-size: 8px;
+  font-size: 12px;
   letter-spacing: .02em;
   color: var(--muted);
 }
@@ -1212,12 +1212,12 @@ a,button {
   min-height: 110px;
 }
 .form-group input::placeholder,.form-group textarea::placeholder {
-  color: #72776e;
+  color: #62665e;
   opacity: 1;
 }
 .char-counter {
   text-align: right;
-  font-size: 9px;
+  font-size: 11px;
   color: var(--muted);
 }
 .honeypot {
@@ -1290,7 +1290,7 @@ a,button {
   font-size: 11px;
 }
 .footer-col-title {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 500;
   color: #f1ebdf;
   letter-spacing: .08em;
@@ -1326,7 +1326,7 @@ a,button {
   justify-content: space-between;
   gap: 20px;
   align-items: center;
-  font-size: 9px;
+  font-size: 11px;
   color: #9bb0b1;
 }
 .footer-love .name {
@@ -1419,9 +1419,7 @@ a,button {
 .footer-links,.footer-contact-list,.footer-tagline {
   font-size: 12px;
 }
-.footer-bottom-inner {
-  font-size: 10px;
-}
+.footer-bottom-inner { font-size: 11px; }
 @media(prefers-reduced-motion:no-preference) {
   .growth-column {
     animation: assemble 1.3s var(--ease) both;
@@ -1648,6 +1646,16 @@ a,button {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
   gap: clamp(1.25rem, 3vw, 2rem);
+}
+@media (min-width: 768px) and (max-width: 1024px) {
+  .contact-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2rem;
+  }
+  .process-steps {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 2rem;
+  }
 }
 .stat-divider {
   display: none;
