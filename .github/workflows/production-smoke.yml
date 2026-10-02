@@ -91,3 +91,13 @@ jobs:
           curl --silent --show-error --fail "$SITE_URL/sitemap.xml" | grep -q '<loc>https://knowledgeexcellencecpa.com/</loc>'
 
           echo "robots.txt and sitemap.xml are reachable"
+
+      - name: Reject internal file exposure
+        run: |
+          for path in worker.js wrangler.toml package.json package-lock.json _headers _redirects .env .dev.vars .git/config RULES.md scripts/security.test.js; do
+            status=$(curl --silent --show-error --output /dev/null --write-out '%{http_code}' "$SITE_URL/$path")
+            if [ "$status" != "404" ]; then
+              echo "Internal path /$path returned $status; expected 404"
+              exit 1
+            fi
+          done

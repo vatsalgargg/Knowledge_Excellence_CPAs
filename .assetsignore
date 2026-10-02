@@ -1,12 +1,18 @@
-node_modules
-.git
-.github
-.vibecode-security
-.qa-output
-scripts
-dist
-PRD.md
-ARCHITECTURE.md
-DESIGN.md
-RULES.md
-PHASES.md
+# Deny by default. Only these reviewed public files may be uploaded.
+*
+!/index.html
+!/index.css
+!/script.js
+!/privacy.html
+!/terms.html
+!/404.html
+!/404.css
+!/logo.png
+!/logo-modified.png
+!/og-image.jpg
+!/robots.txt
+!/sitemap.xml
+!/llms.txt
+# Wrangler reads _headers and _redirects as metadata, not public assets.
+!/.well-known/
+!/.well-known/security.txt

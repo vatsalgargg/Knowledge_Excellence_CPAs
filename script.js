@@ -23,14 +23,13 @@ document.addEventListener('DOMContentLoaded', () => {
   window.scrollTo({ top: 0, behavior: 'instant' });
 
   // ── Security Logger ──────────────────────────────────────────────────────
-  // Structured client-side logging for anomalies, API errors, and spam attempts.
-  // In production, replace console.warn with a POST to your logging endpoint.
+  // Local diagnostics only. Never include URLs, field values or provider messages.
+  // Server-side failures are logged separately by the Worker.
   const secLog = {
     _fmt: (level, event, detail) => ({
-      level, event, detail,
+      level, event,
+      status: Number.isInteger(detail?.status) ? detail.status : undefined,
       ts: new Date().toISOString(),
-      url: location.href,
-      ua: navigator.userAgent.slice(0, 120)
     }),
     warn:  (event, detail) => console.warn('[KECPA-SEC]',  JSON.stringify(secLog._fmt('WARN',  event, detail))),
     error: (event, detail) => console.error('[KECPA-SEC]', JSON.stringify(secLog._fmt('ERROR', event, detail))),
@@ -38,7 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   // ── Form Rate Limiter ─────────────────────────────────────────────────────
-  // Prevents repeated submissions within 60 seconds.
+  // Browser convenience only; Formspree must enforce server-side abuse controls.
   const RATE_LIMIT_MS = 60_000;
   const RL_KEY = 'kecpa_form_last_submit';
   let lastSubmission = 0;

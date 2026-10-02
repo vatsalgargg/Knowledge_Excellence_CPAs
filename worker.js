@@ -72,7 +72,7 @@ const LINK_HEADER = [
   '</.well-known/security.txt>; rel="security"; type="text/plain"',
 ].join(", ");
 
-export default {
+const site = {
   async fetch(request, env) {
     const url = new URL(request.url);
     const accept = request.headers.get("Accept") ?? "";
@@ -141,5 +141,24 @@ export default {
     }
 
     return response;
+  },
+};
+
+export default {
+  async fetch(request, env) {
+    try {
+      const response = await site.fetch(request, env);
+      if (response.status >= 500) {
+        console.error(JSON.stringify({ event: "ASSET_SERVER_ERROR", status: response.status }));
+      }
+      return response;
+    } catch {
+      // Do not log request URLs, headers, bodies or exception messages.
+      console.error(JSON.stringify({ event: "ASSET_FETCH_FAILED" }));
+      return new Response("Service temporarily unavailable.", {
+        status: 503,
+        headers: { ...SECURITY_HEADERS, "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "no-store" },
+      });
+    }
   },
 };

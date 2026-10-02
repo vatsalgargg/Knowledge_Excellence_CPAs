@@ -11,3 +11,9 @@ main = "worker.js"
 directory = "./"
 binding = "ASSETS"
 run_worker_first = true
+
+# Keep only explicit, redacted application errors; invocation logs contain URLs.
+[observability.logs]
+enabled = true
+head_sampling_rate = 1
+invocation_logs = false
