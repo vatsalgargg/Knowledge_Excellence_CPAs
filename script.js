@@ -152,7 +152,7 @@ document.addEventListener('DOMContentLoaded', () => {
   navbar.addEventListener('focusout', event => {
     if (!navbar.contains(event.relatedTarget)) setMenu(false);
   });
-  window.matchMedia('(min-width: 761px)').addEventListener('change', () => setMenu(false));
+  window.matchMedia('(min-width: 1025px)').addEventListener('change', () => setMenu(false));
   navLinks.querySelectorAll('a').forEach(link => {
     link.addEventListener('click', () => {
       setMenu(false);

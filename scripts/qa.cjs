@@ -39,11 +39,12 @@ fs.mkdirSync(output, { recursive: true });
       }));
       for (let i = 1; i < navBoxes.length; i++) assert(navBoxes[i].left >= navBoxes[i-1].right - 1, `Navbar overlap at ${width}`);
       await page.screenshot({ path: path.join(output, `desktop-${width}.png`), fullPage: width === 1440 || width === 390 });
-      if (width < 761) {
+      if (width <= 1024) {
         const toggle = page.locator('#menuToggle');
         await toggle.click();
         assert.equal(await toggle.getAttribute('aria-expanded'), 'true');
         assert(await page.locator('.mobile-nav-cta').isVisible());
+        assert.equal(await page.locator('.nav-link[aria-current]').evaluate(el => getComputedStyle(el).color), 'rgb(19, 39, 45)', 'Active navigation lacks contrast on cream');
         const nav = await page.locator('#navLinks').boundingBox();
         assert(nav.x >= 0 && nav.x + nav.width <= width + 1, 'Mobile menu is clipped');
         await page.screenshot({ path: path.join(output, `menu-${width}.png`) });
