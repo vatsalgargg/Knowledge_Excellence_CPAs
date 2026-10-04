@@ -160,25 +160,72 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // 3. SCROLL REVEAL
-  // Finite, scroll-linked 3D motion. No scroll hijacking or perpetual render loop.
+  // Native scroll: photo parallax, pinned service photos and finite reveals.
   const motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
-  const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
-  const world = document.querySelector('.finance-world');
+  const heroPhoto = document.querySelector('.hero-photo');
+  const servicePhotos = [...document.querySelectorAll('.service-photo')];
+  const serviceIndex = document.querySelector('.service-photo-index');
   const hero = document.querySelector('.hero');
-  const columns = [...document.querySelectorAll('.growth-column')];
+
   const cards = [...document.querySelectorAll('.service-card')];
   const processSteps = [...document.querySelectorAll('.process-step')];
   const process = document.getElementById('process');
-  const processRail = document.querySelector('.process-steps');
-  const globe = document.querySelector('.globe-line-2');
-  const globalMap = document.querySelector('.global-map');
-  const cta = document.querySelector('.cta-banner');
-  const ctaOrbits = [...document.querySelectorAll('.cta-orbits span')];
   const progress = document.querySelector('.reading-progress');
   const navAnchors = [...navLinks.querySelectorAll('.nav-link')];
   const sections = [...document.querySelectorAll('main > section[id]')];
   const clamp = value => Math.min(1, Math.max(0, value));
-  let pointerX = 0, pointerY = 0, frame = 0;
+  // Reveal once, with content visible even when observation/animation is unavailable.
+  // Individual translate avoids competing with the scroll-driven card transforms.
+  const revealAnimations = new Set();
+  const revealTargets = [...document.querySelectorAll('.reveal-up, .reveal-left, .reveal-right, .footer-col, .footer-brand, .footer-wordmark')];
+  if ('IntersectionObserver' in window && typeof Element.prototype.animate === 'function') {
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(({ target, isIntersecting }) => {
+        if (!isIntersecting) return;
+        observer.unobserve(target);
+        target.classList.add('motion-entered');
+        if (motionPreference.matches || target.contains(document.activeElement)) return;
+        const sideways = window.innerWidth > 760 && target.matches('.reveal-left, .reveal-right');
+        const bounds = target.getBoundingClientRect();
+        const fromLeft = target.matches('.reveal-left');
+        const room = Math.max(0, (fromLeft ? bounds.left : innerWidth - bounds.right) - 2);
+        const x = sideways ? Math.min(48, room) * (fromLeft ? -1 : 1) : 0;
+        const siblings = [...target.parentElement.children].filter(el => revealTargets.includes(el));
+        const delay = Math.min(Math.max(0, siblings.indexOf(target)) * 120, 300);
+        const animation = target.animate([
+          { opacity: 0, translate: `${x}px ${sideways ? 24 : 56}px`, filter: 'blur(4px)' },
+          { opacity: 1, translate: '0px 0px', filter: 'blur(0px)' }
+        ], { duration: 950, delay, easing: 'cubic-bezier(.2,.7,.2,1)', fill: 'backwards' });
+        revealAnimations.add(animation);
+        animation.finished.then(() => revealAnimations.delete(animation), () => revealAnimations.delete(animation));
+      });
+    }, { threshold: 0, rootMargin: '0px 0px -6% 0px' });
+    revealTargets.forEach(el => observer.observe(el));
+  }
+  document.addEventListener('focusin', () => {
+    revealAnimations.forEach(animation => {
+      if (animation.effect.target.contains(document.activeElement)) animation.cancel();
+    });
+  });
+  // Read untransformed layout on resize only. Measuring animated bounds on every
+  // scroll creates feedback and visible judder as cards rotate into position.
+  let cardLayout = [], stepLayout = [];
+  function measureMotion() {
+    const measure = el => {
+      let top = 0;
+      for (let node = el; node; node = node.offsetParent) top += node.offsetTop;
+      return { top, height: el.offsetHeight };
+    };
+    cardLayout = cards.map(measure);
+    let stepTop = measure(document.querySelector('.process-steps')).top;
+    stepLayout = processSteps.map(step => {
+      const rect = { top: stepTop, height: step.offsetHeight };
+      stepTop += step.offsetHeight + parseFloat(getComputedStyle(step).marginBottom);
+      return rect;
+    });
+  }
+  measureMotion();
+  let frame = 0;
   function renderMotion() {
     frame = 0;
     const height = window.innerHeight;
@@ -186,9 +233,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const desktop = window.innerWidth > 760;
     const heroRect = hero.getBoundingClientRect();
     const processRect = process.getBoundingClientRect();
-    const mapRect = globalMap.getBoundingClientRect();
-    const ctaRect = cta.getBoundingClientRect();
-    const cardRects = cards.map(card => card.getBoundingClientRect());
+
+    const cardRects = cardLayout.map(rect => ({ top: rect.top - window.scrollY, bottom: rect.top + rect.height - window.scrollY }));
     const sectionRects = sections.map(section => section.getBoundingClientRect());
     const scrollRange = document.documentElement.scrollHeight - height;
     progress.style.transform = `scaleX(${clamp(window.scrollY / Math.max(1, scrollRange))})`;
@@ -198,51 +244,39 @@ document.addEventListener('DOMContentLoaded', () => {
       if (link.hash === `#${current}`) link.setAttribute('aria-current', 'location');
       else link.removeAttribute('aria-current');
     });
+    const activeService = Math.max(0, cardRects.findLastIndex(rect => rect.top < height * .6));
+    servicePhotos.forEach((photo, i) => photo.classList.toggle('is-active', i === activeService));
+    serviceIndex.textContent = `0${activeService + 1} / 05`;
     if (reduced) {
-      world.style.transform = '';
-      [...cards, ...columns, ...processSteps, ...ctaOrbits, globe].forEach(el => el.style.transform = '');
-      processRail.style.setProperty('--process-progress', '1');
+      revealAnimations.forEach(animation => animation.cancel());
+      heroPhoto.style.transform = '';
+      [...cards, ...processSteps].forEach(el => el.style.transform = '');
       return;
     }
     if (heroRect.bottom > 0) {
       const p = clamp(-heroRect.top / heroRect.height);
-      world.style.transform = `rotateX(${-19 + p * 16 + pointerY * 4}deg) rotateY(${-31 + p * 42 + pointerX * 9}deg) translateY(${-p * 1.875}em)`;
-      columns.forEach((column, i) => column.style.transform = `translateY(${-p * i * .875}em)`);
+      heroPhoto.style.transform = desktop ? `scale(${1.08 + p * .1}) translateY(${p * 5}%)` : '';
     }
     cards.forEach((card, i) => {
       const rect = cardRects[i];
-      if (!desktop) { card.style.transform = ''; return; }
       if (rect.bottom < 0 || rect.top > height) return;
-      const enter = clamp((rect.top - height * .5) / (height * .6));
-      card.style.transform = desktop && !card.matches(':focus-within, :hover') ? `rotateX(${enter * 12}deg) translateY(${enter * 18}px)` : '';
+      const enter = clamp((rect.top - height * .35) / (height * .65));
+      card.style.transform = `translateY(${enter * (desktop ? 48 : 16)}px)`;
     });
-    const processProgress = clamp((height - processRect.top) / (height * .85));
-    processRail.style.setProperty('--process-progress', String(processProgress));
     processSteps.forEach((step, i) => {
-      if (!desktop) { step.style.transform = ''; return; }
       if (processRect.bottom < 0 || processRect.top > height) return;
-      const p = clamp((processProgress - i * .12) / .64);
-      step.style.transform = desktop ? `rotateX(${(1 - p) * 16}deg) translateY(${(1 - p) * 28}px)` : '';
+      const p = clamp((height * .9 - (stepLayout[i].top - window.scrollY)) / (height * .45));
+      const next = stepLayout[i + 1];
+      const covered = next ? clamp((height * .7 - (next.top - window.scrollY)) / (height * .7 - 48)) : 0;
+      step.style.transform = desktop ? `scale(${.92 + p * .08 - covered * .045})` : `translateY(${(1-p)*16}px)`;
     });
-    if (mapRect.top < height && mapRect.bottom > 0) globe.style.transform = `rotate(${-18 + clamp((height - mapRect.top) / height) * 45}deg) scaleX(.5)`;
-    if (ctaRect.top < height && ctaRect.bottom > 0) {
-      const p = clamp((height - ctaRect.top) / (height + ctaRect.height));
-      ctaOrbits.forEach((ring, i) => ring.style.transform = `rotateX(${52 + p * 20}deg) rotateZ(${-35 + p * 45 + i * 5}deg)`);
-    }
   }
   function scheduleMotion() { if (!frame) frame = requestAnimationFrame(renderMotion); }
   window.addEventListener('scroll', scheduleMotion, { passive: true });
-  window.addEventListener('resize', scheduleMotion, { passive: true });
+  window.addEventListener('resize', () => { measureMotion(); scheduleMotion(); }, { passive: true });
   motionPreference.addEventListener('change', scheduleMotion);
-  hero.addEventListener('pointermove', event => {
-    if (!finePointer.matches || motionPreference.matches) return;
-    const rect = hero.getBoundingClientRect();
-    pointerX = (event.clientX - rect.left) / rect.width - .5;
-    pointerY = (event.clientY - rect.top) / rect.height - .5;
-    scheduleMotion();
-  }, { passive: true });
-  hero.addEventListener('pointerleave', () => { pointerX = pointerY = 0; scheduleMotion(); });
-  document.fonts.ready.then(scheduleMotion);
+  document.fonts.ready.then(() => { measureMotion(); scheduleMotion(); });
+  window.addEventListener('load', () => { measureMotion(); scheduleMotion(); }, { once: true });
   scheduleMotion();
 
 

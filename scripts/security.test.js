@@ -8,7 +8,12 @@ import worker from '../worker.js';
 test('deployment allowlist excludes internal, nested and future secret files', () => {
   const publicFiles = ['index.html', 'index.css', 'script.js', 'privacy.html', 'terms.html',
     '404.html', '404.css', 'logo.png', 'logo-modified.png', 'og-image.jpg', 'robots.txt',
-    'sitemap.xml', 'llms.txt', '.well-known/security.txt'];
+    'sitemap.xml', 'llms.txt', '.well-known/security.txt',
+    'financial-hero.webp', 'financial-hero-small.webp',
+    'financial-accounting.webp', 'financial-accounting-small.webp',
+    'financial-advisory.webp', 'financial-advisory-small.webp',
+    'financial-tax.webp', 'financial-tax-small.webp',
+    'financial-bookkeeping.webp', 'financial-bookkeeping-small.webp'];
   const privateFiles = ['worker.js', 'wrangler.toml', 'package.json', 'package-lock.json',
     '.env', '.env.production', '.dev.vars', 'credentials.json', 'private.key',
     '.git/config', '_headers', '_redirects', 'RULES.md', 'scripts/security.test.js', 'src/main.tsx',

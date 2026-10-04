@@ -14,7 +14,7 @@ fs.mkdirSync(output, { recursive: true });
     const page = await browser.newPage();
     const errors = [];
     page.on('pageerror', error => errors.push(error.message));
-    for (const [width, height] of [[320,568],[360,740],[375,667],[390,844],[430,932],[568,320],[667,375],[761,600],[768,1024],[820,1180],[1024,768],[1280,800],[1440,900],[1920,1080],[2560,1440]]) {
+    for (const [width, height] of [[320,568],[360,740],[375,667],[390,844],[430,932],[568,320],[667,375],[761,600],[768,1024],[820,1180],[1024,768],[1280,800],[1366,768],[1440,900],[1536,864],[1920,1080],[2560,1440]]) {
       await page.setViewportSize({ width, height });
       await page.goto(base, { waitUntil: 'networkidle' });
       assert.equal(await page.locator('.service-card').count(), 5);
@@ -81,18 +81,60 @@ fs.mkdirSync(output, { recursive: true });
       const clean = value => value.replace(/\s+/g, ' ').trim();
       const current = clean(document.body.textContent);
       return [...baseline.querySelectorAll('h1,h2,h3,h4,p,label,.contact-detail')]
+        .filter(el => !el.closest('#pageLoader'))
         .map(el => clean(el.textContent)).filter(text => text && !current.includes(text));
     }, original);
     assert.deepEqual(missingCopy, [], 'Original business content changed');
     await page.screenshot({ path: path.join(output, 'hero.png') });
-    const initial = await page.locator('.finance-world').evaluate(el => el.style.transform);
+    const initial = await page.locator('.hero-photo').evaluate(el => el.style.transform);
     await page.evaluate(() => scrollTo({ top: 300, behavior: 'instant' }));
     await page.waitForTimeout(150);
-    assert.notEqual(await page.locator('.finance-world').evaluate(el => el.style.transform), initial, '3D sculpture did not respond to scroll');
+    assert.notEqual(await page.locator('.hero-photo').evaluate(el => el.style.transform), initial, 'Hero photograph did not respond to scroll');
     await page.screenshot({ path: path.join(output, 'hero-scrolled.png') });
+    await page.locator('.service-card').first().scrollIntoViewIfNeeded();
+    await page.waitForTimeout(900);
+    const cardTransform = await page.locator('.service-card').first().evaluate(el => el.style.transform);
+    for (let i = 0; i < 8; i++) {
+      await page.evaluate(() => window.dispatchEvent(new Event('scroll')));
+      await page.waitForTimeout(30);
+    }
+    assert.equal(await page.locator('.service-card').first().evaluate(el => el.style.transform), cardTransform, 'Card transform feeds back into scroll geometry');
+    assert(await page.locator('.service-card').first().evaluate(el => el.classList.contains('motion-entered')), 'Card reveal did not run');
+    await page.screenshot({ path: path.join(output, 'motion-services.png') });
+    for (let i = 0; i < 5; i++) {
+      await page.locator('.service-card').nth(i).scrollIntoViewIfNeeded();
+      await page.waitForTimeout(500);
+      assert.equal(await page.locator('.service-photo.is-active').count(), 1, 'Photo sequence must have one active image');
+      assert.equal(await page.locator('.service-photo-index').textContent(), `0${i+1} / 05`, 'Photo sequence out of sync');
+    }
+    await page.locator('.service-card').nth(1).scrollIntoViewIfNeeded();
+    await page.waitForTimeout(600);
+    const pinnedTop = await page.locator('.service-media').evaluate(el => el.getBoundingClientRect().top);
+    await page.evaluate(() => scrollBy({ top: 100, behavior: 'instant' }));
+    await page.waitForTimeout(150);
+    assert.equal(await page.locator('.service-media').evaluate(el=>el.getBoundingClientRect().top), pinnedTop, 'Service photo is not pinned');
+    assert(await page.locator('.hero-photo').evaluate(el=>el.complete && el.naturalWidth>0), 'Hero asset did not load');
+    await page.locator('.stats-banner').scrollIntoViewIfNeeded();
+    await page.waitForTimeout(1300);
+    const statHeights = await page.locator('.stat-item').evaluateAll(els=>els.map(el=>el.offsetHeight));
+    assert(Math.max(...statHeights)-Math.min(...statHeights)<2, 'Credential cards are unequal');
+    assert(Math.max(...statHeights)<180, 'Credential cards are oversized');
+    await page.screenshot({path:path.join(output,'credentials.png')});
+    await page.locator('#process').scrollIntoViewIfNeeded();
+    await page.waitForTimeout(1300);
+    const stepTop = await page.locator('.process-steps').evaluate(el=>el.getBoundingClientRect().top+scrollY);
+    await page.evaluate(y=>scrollTo({top:y+120,behavior:'instant'}),stepTop);
+    await page.waitForTimeout(1300);
+    const processScale = await page.locator('.process-step').first().evaluate(el=>el.style.transform);
+    await page.evaluate(()=>scrollBy({top:200,behavior:'instant'}));
+    await page.waitForTimeout(200);
+    assert.notEqual(await page.locator('.process-step').first().evaluate(el=>el.style.transform),processScale,'Stacked card scaling did not respond to scroll');
+    await page.screenshot({path:path.join(output,'process-stack.png')});
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.waitForTimeout(150);
-    assert.equal(await page.locator('.finance-world').evaluate(el => el.style.transform), '', 'Reduced motion not applied');
+    assert.equal(await page.locator('.hero-photo').evaluate(el => el.style.transform), '', 'Reduced motion not applied');
+    assert.equal(await page.locator('.service-card').first().evaluate(el => el.style.transform), '', 'Reduced motion did not reset card effects');
+    assert.equal(await page.evaluate(() => document.getAnimations().filter(animation => animation.playState === 'running').length), 0, 'Reduced motion left animations running');
     await page.emulateMedia({ reducedMotion: 'no-preference' });
     // Intercept delivery: QA must not send any real email or contact submission.
     let submissions = 0;

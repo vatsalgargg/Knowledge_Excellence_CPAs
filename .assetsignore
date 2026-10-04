@@ -16,3 +16,14 @@
 # Wrangler reads _headers and _redirects as metadata, not public assets.
 !/.well-known/
 !/.well-known/security.txt
+
+!/financial-hero.webp
+!/financial-hero-small.webp
+!/financial-accounting.webp
+!/financial-accounting-small.webp
+!/financial-advisory.webp
+!/financial-advisory-small.webp
+!/financial-tax.webp
+!/financial-tax-small.webp
+!/financial-bookkeeping.webp
+!/financial-bookkeeping-small.webp
