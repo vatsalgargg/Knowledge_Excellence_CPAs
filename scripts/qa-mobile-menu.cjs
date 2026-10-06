@@ -29,7 +29,8 @@ const { chromium, webkit } = require(process.env.PLAYWRIGHT_PATH || 'playwright'
         assert.equal(geometry.color, 'rgb(19, 39, 45)', 'Menu text has contrast');
         if (width === 390 && engine === chromium) await page.screenshot({ path: '.qa-output/mobile-menu-fixed.png' });
         await page.keyboard.press('Escape');
-        await page.waitForTimeout(250);
+        assert.equal(await toggle.getAttribute('aria-expanded'), 'false');
+        await menu.waitFor({ state: 'hidden' });
         assert.equal(await menu.isVisible(), false);
         await toggle.click();
         await menu.locator('a[href="#services"]').click();
