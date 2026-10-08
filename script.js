@@ -177,6 +177,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Reveal once, with content visible even when observation/animation is unavailable.
   // Individual translate avoids competing with the scroll-driven card transforms.
   const revealAnimations = new Set();
+  const pendingReveals = new WeakMap();
   const revealTargets = [...document.querySelectorAll('.reveal-up, .reveal-left, .reveal-right, .footer-col, .footer-brand, .footer-wordmark')];
   if ('IntersectionObserver' in window && typeof Element.prototype.animate === 'function') {
     const observer = new IntersectionObserver(entries => {
@@ -184,23 +185,33 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!isIntersecting) return;
         observer.unobserve(target);
         target.classList.add('motion-entered');
-        if (motionPreference.matches || target.contains(document.activeElement)) return;
-        const sideways = window.innerWidth > 760 && target.matches('.reveal-left, .reveal-right');
+        const animation = pendingReveals.get(target);
+        if (!animation || animation.playState === 'idle') return;
+        if (motionPreference.matches || target.contains(document.activeElement)) animation.cancel();
+        else animation.play();
+      });
+    }, { threshold: 0, rootMargin: '0px 0px 64px 0px' });
+    revealTargets.forEach(target => {
         const bounds = target.getBoundingClientRect();
+        // Never hide content already on screen. Prepare offscreen reveals before scrolling.
+        if (motionPreference.matches || bounds.top < innerHeight || target.contains(document.activeElement)) return;
+        const mobile = window.innerWidth <= 760;
+        const sideways = window.innerWidth > 760 && target.matches('.reveal-left, .reveal-right');
         const fromLeft = target.matches('.reveal-left');
         const room = Math.max(0, (fromLeft ? bounds.left : innerWidth - bounds.right) - 2);
         const x = sideways ? Math.min(48, room) * (fromLeft ? -1 : 1) : 0;
         const siblings = [...target.parentElement.children].filter(el => revealTargets.includes(el));
-        const delay = Math.min(Math.max(0, siblings.indexOf(target)) * 120, 300);
+        const delay = mobile ? 0 : Math.min(Math.max(0, siblings.indexOf(target)) * 120, 300);
         const animation = target.animate([
-          { opacity: 0, translate: `${x}px ${sideways ? 24 : 56}px`, filter: 'blur(4px)' },
-          { opacity: 1, translate: '0px 0px', filter: 'blur(0px)' }
-        ], { duration: 950, delay, easing: 'cubic-bezier(.2,.7,.2,1)', fill: 'backwards' });
+          { opacity: 0, translate: `${x}px ${mobile ? 16 : sideways ? 24 : 56}px` },
+          { opacity: 1, translate: '0px 0px' }
+        ], { duration: mobile ? 400 : 950, delay, easing: 'cubic-bezier(.2,.7,.2,1)', fill: 'backwards' });
+        animation.pause();
+        pendingReveals.set(target, animation);
         revealAnimations.add(animation);
         animation.finished.then(() => revealAnimations.delete(animation), () => revealAnimations.delete(animation));
-      });
-    }, { threshold: 0, rootMargin: '0px 0px -6% 0px' });
-    revealTargets.forEach(el => observer.observe(el));
+        observer.observe(target);
+    });
   }
   document.addEventListener('focusin', () => {
     revealAnimations.forEach(animation => {
@@ -256,6 +267,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (heroRect.bottom > 0) {
       const p = clamp(-heroRect.top / heroRect.height);
       heroPhoto.style.transform = desktop ? `scale(${1.08 + p * .1}) translateY(${p * 5}%)` : '';
+    }
+    // Phone cards use only the one-time reveal, not a second scroll transform.
+    if (!desktop) {
+      [...cards, ...processSteps].forEach(el => el.style.transform = '');
+      return;
     }
     cards.forEach((card, i) => {
       const rect = cardRects[i];
