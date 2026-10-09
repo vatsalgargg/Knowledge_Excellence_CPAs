@@ -10,7 +10,7 @@
     "test:security": "node --test scripts/security.test.js"
   },
   "dependencies": {
-    "@vitejs/plugin-react": "6.1.1",
+    "@vitejs/plugin-react": "6.1.2",
     "clsx": "2.1.1",
     "framer-motion": "13.5.0",
     "react": "19.3.0",
