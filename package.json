@@ -10,18 +10,18 @@
     "test:security": "node --test scripts/security.test.js"
   },
   "dependencies": {
-    "@vitejs/plugin-react": "6.1.1",
+    "@vitejs/plugin-react": "6.1.2",
     "clsx": "2.1.1",
-    "framer-motion": "13.5.0",
+    "framer-motion": "14.2.0",
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "tailwind-merge": "3.7.0"
   },
   "devDependencies": {
     "autoprefixer": "10.6.1",
-    "postcss": "8.5.28",
+    "postcss": "8.5.30",
     "tailwindcss": "4.3.3",
     "typescript": "7.0.2",
-    "vite": "8.3.2"
+    "vite": "8.3.4"
   }
 }
