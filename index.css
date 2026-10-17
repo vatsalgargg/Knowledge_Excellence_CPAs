@@ -1550,6 +1550,41 @@ a,button {
   .navbar .nav-links { gap: 14px; padding-inline: 14px; }
   .navbar .btn-nav-cta { padding-inline: 12px; }
 }
+/* Offshore outsourcing */
+.outsourcing { background: radial-gradient(ellipse at 15% 0%,#32606b,transparent 60%),var(--navy); color: var(--paper); border-radius: 2rem; width: min(calc(100% - 2rem),87rem); margin: clamp(2rem,5vw,4rem) auto 0; }
+.outsourcing-intro { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,24rem),1fr)); gap: clamp(1.5rem,4vw,4.5rem); align-items: end; }
+.outsourcing-intro>* { min-width: 0; }
+.outsourcing .section-eyebrow { color: #ed945e; }
+.outsourcing .section-title { max-width: 36rem; margin-bottom: 0; }
+.outsourcing .section-body { color: #c8d4d3; }
+.outsourcing-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,20rem),1fr)); gap: clamp(1rem,2vw,1.5rem); margin-top: clamp(2.5rem,5vw,4rem); }
+.outsourcing-card { min-width: 0; padding: clamp(1.4rem,2.5vw,2rem); border: 1px solid #ffffff20; border-radius: 1.25rem; background: #f5f2eb0a; transition: border-color .25s,background .25s; }
+.outsourcing-card:hover { border-color: #ed945e70; background: #ed945e12; }
+.outsourcing-card i { display: grid; place-items: center; width: 44px; height: 44px; margin-bottom: 1.25rem; border-radius: 12px; background: #ed945e24; color: #ed945e; font-size: 1rem; }
+.outsourcing-card h3 { margin-bottom: .75rem; font: 400 clamp(1.3rem,1.1rem + .5vw,1.6rem)/1.25 var(--font-serif); }
+.outsourcing-card p { color: #c8d4d3; font-size: 14px; line-height: 1.8; }
+.outsourcing .outsourcing-cta { margin-top: clamp(2rem,4vw,3rem); background: #ed945e; color: var(--ink); }
+.outsourcing .outsourcing-cta:hover { background: #f4ba8d; }
+/* FAQ */
+.faq-grid { display: grid; gap: clamp(2rem,5vw,5rem); align-items: start; }
+.faq-grid>* { min-width: 0; }
+.faq .section-eyebrow { color: var(--copper); }
+.faq-list { border-top: 1px solid var(--line); }
+.faq-item { border-bottom: 1px solid var(--line); }
+.faq-item summary { display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; min-height: 44px; padding: 1.4rem 0; list-style: none; cursor: pointer; font: 400 clamp(1.15rem,1rem + .45vw,1.4rem)/1.35 var(--font-serif); color: var(--ink); }
+.faq-item summary::-webkit-details-marker { display: none; }
+.faq-item summary::after { content: '+'; flex: none; display: grid; place-items: center; width: 36px; height: 36px; border: 1px solid var(--line); border-radius: 50%; font: 400 1.25rem/1 var(--font-sans); color: var(--copper); transition: rotate .3s var(--ease),background .25s,color .25s,border-color .25s; }
+.faq-item summary:hover::after { border-color: var(--copper); }
+.faq-item[open] summary::after { rotate: 45deg; border-color: var(--copper); background: var(--copper); color: var(--paper); }
+.faq-item p { max-width: 44rem; padding: 0 3.5rem 1.6rem 0; color: var(--muted); font-size: 15px; line-height: 1.85; }
+@media (min-width: 861px) {
+  .faq-grid { grid-template-columns: minmax(0,1fr) minmax(0,1.6fr); }
+  .faq-header { position: sticky; top: 120px; }
+}
+@media (max-width: 760px) {
+  .outsourcing { width: calc(100% - 1rem); border-radius: 1.5rem; }
+  .faq-item p { padding-right: 0; }
+}
 
 /* ── PARTNER PASS POPUP ───────────────────────────────────── */
 html.pp-open { overflow: hidden; }
