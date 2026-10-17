@@ -407,6 +407,159 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // ── PARTNER PASS POPUP ────────────────────────────────────────────────────
+  // Outreach to CPA firms outside India. Opens as soon as the site loads on every visit;
+  // a dismissal is remembered for the browser session, a claim for 30 days.
+  // Storage holds only a status and timestamp; the typed firm name never leaves the page
+  // unless the visitor submits the contact form themselves.
+  const pp = document.getElementById('partnerPass');
+  if (pp && typeof pp.showModal === 'function') {
+    const PP_KEY = 'kecpa_partner_pass';
+    const DAY = 86_400_000;
+    const swing = document.getElementById('ppSwing');
+    const ppForm = document.getElementById('ppForm');
+    const firmInput = document.getElementById('ppFirm');
+    const cardName = document.getElementById('ppCardName');
+    const status = document.getElementById('ppStatus');
+    const statusText = document.getElementById('ppStatusText');
+    const serial = document.getElementById('ppSerial');
+    const reopen = document.getElementById('ppReopen');
+    const stage = pp.querySelector('.pp-stage');
+    let ppMemory = '';
+    let shownThisVisit = false;
+    let lastFocus = null;
+
+    const readState = () => {
+      try { return sessionStorage.getItem(PP_KEY) || localStorage.getItem(PP_KEY) || ppMemory; } catch { return ppMemory; }
+    };
+    const writeState = (kind) => {
+      ppMemory = `${kind}:${Date.now()}`;
+      try { (kind === 'claimed' ? localStorage : sessionStorage).setItem(PP_KEY, ppMemory); }
+      catch { /* Memory fallback covers this visit. */ }
+    };
+    const [savedKind, savedAt] = readState().split(':');
+    const quietFor = savedKind === 'claimed' ? 30 * DAY : Infinity;
+    const suppressed = Boolean(savedKind) && Date.now() - (parseInt(savedAt, 10) || 0) < quietFor;
+    const forced = new URLSearchParams(location.search).has('partner');
+
+    // Damped pendulum: runs only while the badge is moving, then stops its frame loop.
+    let angle = 0, velocity = 0, swingFrame = 0, lastTick = 0;
+    function swingStep(now) {
+      const dt = Math.min((now - lastTick) / 1000, 0.032);
+      lastTick = now;
+      velocity += (-42 * angle - 1.7 * velocity) * dt;
+      angle += velocity * dt;
+      swing.style.setProperty('--pp-angle', `${angle.toFixed(3)}deg`);
+      swing.style.setProperty('--pp-tilt', (angle / 10).toFixed(3));
+      if (Math.abs(angle) < 0.02 && Math.abs(velocity) < 0.05) {
+        angle = velocity = 0;
+        swing.style.setProperty('--pp-angle', '0deg');
+        swingFrame = 0;
+        return;
+      }
+      swingFrame = requestAnimationFrame(swingStep);
+    }
+    function nudge(impulse) {
+      if (motionPreference.matches) return;
+      velocity = Math.max(-140, Math.min(140, velocity + impulse));
+      if (!swingFrame) { lastTick = performance.now(); swingFrame = requestAnimationFrame(swingStep); }
+    }
+    swing.addEventListener('animationend', () => {
+      swing.classList.add('is-settled');
+      nudge(70);
+    });
+    pp.querySelector('.pp-hang').addEventListener('pointermove', event => {
+      if (event.pointerType === 'mouse') nudge(event.movementX * 0.9);
+    });
+    pp.querySelector('.pp-hang').addEventListener('pointerdown', () => nudge(angle >= 0 ? -60 : 60));
+
+    // Live badge personalisation (textContent only).
+    const cleanFirm = value => value.replace(/[^\p{L}\p{N} &.,'-]/gu, '').replace(/\s+/g, ' ').trim().slice(0, 48);
+    function renderBadge() {
+      const firm = cleanFirm(firmInput.value);
+      const active = firm.length >= 2;
+      cardName.textContent = firm || 'Your CPA Firm';
+      cardName.classList.toggle('is-placeholder', !firm);
+      status.classList.toggle('is-active', active);
+      statusText.textContent = active ? 'Pass activated' : 'Add your firm name';
+      let hash = 0;
+      for (const ch of firm.toLowerCase()) hash = (hash * 31 + ch.codePointAt(0)) % 9973;
+      serial.textContent = `No. 2027-${String(firm ? hash : 0).padStart(4, '0')}`;
+    }
+    let wasActive = false;
+    firmInput.addEventListener('input', () => {
+      renderBadge();
+      const active = status.classList.contains('is-active');
+      if (active !== wasActive) nudge(active ? 45 : -25);
+      wasActive = active;
+    });
+
+    function openPass() {
+      if (pp.open) return;
+      shownThisVisit = true;
+      lastFocus = document.activeElement;
+      setMenu(false);
+      reopen.hidden = true;
+      swing.classList.remove('is-settled');
+      angle = velocity = 0;
+      swing.style.setProperty('--pp-angle', '0deg');
+      document.documentElement.classList.add('pp-open');
+      pp.showModal();
+      stage.scrollTop = 0;
+    }
+    function closePass(kind = 'dismissed') {
+      if (!pp.open || pp.classList.contains('is-closing')) return;
+      writeState(kind);
+      const finish = () => {
+        pp.classList.remove('is-closing');
+        pp.close();
+        document.documentElement.classList.remove('pp-open');
+        cancelAnimationFrame(swingFrame);
+        swingFrame = 0;
+        reopen.hidden = kind === 'claimed';
+        if (kind !== 'claimed') lastFocus?.focus?.({ preventScroll: true });
+      };
+      if (motionPreference.matches) return finish();
+      pp.classList.add('is-closing');
+      setTimeout(finish, 320);
+    }
+
+    pp.addEventListener('cancel', event => { event.preventDefault(); closePass(); });
+    document.getElementById('ppClose').addEventListener('click', () => closePass());
+    document.getElementById('ppLater').addEventListener('click', () => closePass());
+    stage.addEventListener('click', event => {
+      if (event.target === stage || event.target.classList.contains('pp-grid')) closePass();
+    });
+    reopen.addEventListener('click', openPass);
+    // Keep the reopen tab off the hero, where it would cover the trust badges.
+    const placeReopen = () => reopen.classList.toggle('is-away', scrollY < innerHeight * 0.7);
+    addEventListener('scroll', placeReopen, { passive: true });
+    placeReopen();
+
+    ppForm.addEventListener('submit', event => {
+      event.preventDefault();
+      const firm = cleanFirm(firmInput.value);
+      const message = document.getElementById('message');
+      if (message && !message.value.trim()) {
+        message.value = `Partner Pass request${firm ? ` from ${firm}` : ''}: we are a CPA firm outside India `
+          + 'interested in outsourcing bookkeeping, tax return preparation and advisory support.';
+        message.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+      closePass('claimed');
+      setTimeout(() => {
+        document.getElementById('contact')?.scrollIntoView({ behavior: motionPreference.matches ? 'auto' : 'smooth' });
+        setTimeout(() => document.getElementById('name')?.focus({ preventScroll: true }), motionPreference.matches ? 0 : 700);
+      }, motionPreference.matches ? 0 : 340);
+    });
+
+    // Open right after the page loader fades; `?partner` campaign links always open it.
+    if (forced || !suppressed) {
+      setTimeout(() => { if (!shownThisVisit) openPass(); }, 600);
+    } else {
+      reopen.hidden = savedKind === 'claimed';
+    }
+  }
+
   // Log unhandled JS errors (unusual JS exceptions may indicate tampering)
   window.addEventListener('error', (e) => {
     secLog.error('UNHANDLED_JS_ERROR', { message: e.message, file: e.filename, line: e.lineno });

@@ -529,6 +529,82 @@
         </div>
     </footer>
 
+    <!-- PARTNER PASS POPUP: outreach to CPA firms outside India -->
+    <dialog class="pp" id="partnerPass" aria-labelledby="ppTitle" aria-describedby="ppLead">
+        <div class="pp-stage">
+            <button type="button" class="pp-close" id="ppClose" aria-label="Close partner invitation">
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            </button>
+            <div class="pp-grid">
+                <div class="pp-hang" aria-hidden="true">
+                    <div class="pp-swing" id="ppSwing">
+                        <div class="pp-strap">
+                            <span>Knowledge Excellence CPAs <b>·</b> Partner Program <b>·</b> Knowledge Excellence CPAs <b>·</b> Partner Program</span>
+                        </div>
+                        <svg class="pp-clip" viewBox="0 0 40 64" focusable="false">
+                            <defs>
+                                <linearGradient id="ppMetal" x1="0" x2="1">
+                                    <stop offset="0" stop-color="#8c969a"/><stop offset=".45" stop-color="#f4f2ec"/><stop offset="1" stop-color="#7d878b"/>
+                                </linearGradient>
+                            </defs>
+                            <path d="M9 2h22l-4 12H13z" fill="none" stroke="url(#ppMetal)" stroke-width="3" stroke-linejoin="round"/>
+                            <rect x="15" y="14" width="10" height="12" rx="3" fill="url(#ppMetal)"/>
+                            <path d="M20 26v8c-7 0-9 6-9 12s4 14 9 14 9-5 9-12V36" fill="none" stroke="url(#ppMetal)" stroke-width="3" stroke-linecap="round"/>
+                        </svg>
+                        <div class="pp-card">
+                            <span class="pp-slot"></span>
+                            <div class="pp-card-brand">
+                                <img src="logo.png" alt="" width="30" height="30">
+                                <span>Knowledge Excellence <em>CPAs</em></span>
+                            </div>
+                            <p class="pp-card-title">Partner Pass</p>
+                            <p class="pp-card-edition"><span>Busy Season 2027</span></p>
+                            <p class="pp-card-name" id="ppCardName">Your CPA Firm</p>
+                            <p class="pp-card-role">Offshore Partner</p>
+                            <div class="pp-card-foot">
+                                <span class="pp-card-status" id="ppStatus">
+                                    <svg viewBox="0 0 24 24" focusable="false"><circle cx="12" cy="12" r="10.5"/><path d="M7 12.5l3.2 3.2L17 9"/></svg>
+                                    <span id="ppStatusText">Add your firm name</span>
+                                </span>
+                                <span class="pp-card-serial" id="ppSerial">No. 2027-0000</span>
+                            </div>
+                            <span class="pp-sheen"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pp-copy">
+                    <p class="pp-eyebrow"><span></span> For CPA &amp; accounting firms outside India</p>
+                    <h2 class="pp-title" id="ppTitle">Your busy season, <em>handled.</em></h2>
+                    <p class="pp-lead" id="ppLead">Extend your firm with a white-label offshore team led by
+                        U.S. Dual Licensed CPAs (Montana &amp; Washington). We work as a seamless extension of your staff,
+                        in your software and on your deadlines.</p>
+                    <ul class="pp-services">
+                        <li><i class="fas fa-calculator" aria-hidden="true"></i><div><strong>Bookkeeping &amp; Payroll</strong><span>Monthly close, reconciliations and full-cycle payroll.</span></div></li>
+                        <li><i class="fas fa-file-invoice-dollar" aria-hidden="true"></i><div><strong>Tax Return Preparation</strong><span>Individual and business returns, prepared review-ready.</span></div></li>
+                        <li><i class="fas fa-briefcase" aria-hidden="true"></i><div><strong>Advisory &amp; Virtual CFO</strong><span>Forecasting, planning and reporting support for your clients.</span></div></li>
+                    </ul>
+                    <form class="pp-form" id="ppForm" novalidate>
+                        <label for="ppFirm">Personalise your pass <span>(optional)</span></label>
+                        <div class="pp-form-row">
+                            <input type="text" id="ppFirm" name="firm" maxlength="48" autocomplete="organization" placeholder="Your firm name">
+                            <button type="submit" class="pp-cta">Claim Partner Pass <i class="fas fa-arrow-right" aria-hidden="true"></i></button>
+                        </div>
+                    </form>
+                    <div class="pp-trust">
+                        <span><i class="fas fa-lock" aria-hidden="true"></i> NDAs on every engagement</span>
+                        <span><i class="fas fa-clock" aria-hidden="true"></i> 24hr response</span>
+                        <span><i class="fas fa-scale-balanced" aria-hidden="true"></i> US GAAP</span>
+                    </div>
+                    <button type="button" class="pp-later" id="ppLater">Maybe later</button>
+                </div>
+            </div>
+        </div>
+    </dialog>
+    <button type="button" class="pp-reopen" id="ppReopen" hidden>
+        <i class="fas fa-id-badge" aria-hidden="true"></i> CPA firm? Get your Partner Pass
+    </button>
+
     <script type="module" src="script.js"></script>
 </body>
 
