@@ -12,7 +12,7 @@ Existing static HTML, CSS, JavaScript, Vite; native CSS 3D transforms and lightw
 
 ## Data classification
 - Website copy and graphics are public. Contact name, email, phone and message are personal data sent to the existing Formspree endpoint only on user submission.
-- localStorage contains only a form submission timestamp and the partner-popup claim status with a timestamp (dismissals use sessionStorage); a memory fallback handles denied storage. The firm name typed into the popup stays in the page and reaches Formspree only if the visitor submits the contact form. No financial records or API credentials are introduced.
+- localStorage contains only a form submission timestamp; a memory fallback handles denied storage. The partner popup stores nothing and opens on every load; the firm name typed into the popup stays in the page and reaches Formspree only if the visitor submits the contact form. No financial records or API credentials are introduced.
 - Remote Formspree retention is controlled by the existing account, not by this frontend.
 
 ## Security architecture

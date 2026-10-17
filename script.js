@@ -408,14 +408,11 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ── PARTNER PASS POPUP ────────────────────────────────────────────────────
-  // Outreach to CPA firms outside India. Opens as soon as the site loads on every visit;
-  // a dismissal is remembered for the browser session, a claim for 30 days.
-  // Storage holds only a status and timestamp; the typed firm name never leaves the page
-  // unless the visitor submits the contact form themselves.
+  // Outreach to CPA firms outside India. Opens on every page load, including refreshes.
+  // Nothing is stored; the typed firm name never leaves the page unless the visitor
+  // submits the contact form themselves.
   const pp = document.getElementById('partnerPass');
   if (pp && typeof pp.showModal === 'function') {
-    const PP_KEY = 'kecpa_partner_pass';
-    const DAY = 86_400_000;
     const swing = document.getElementById('ppSwing');
     const ppForm = document.getElementById('ppForm');
     const firmInput = document.getElementById('ppFirm');
@@ -425,22 +422,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const serial = document.getElementById('ppSerial');
     const reopen = document.getElementById('ppReopen');
     const stage = pp.querySelector('.pp-stage');
-    let ppMemory = '';
-    let shownThisVisit = false;
     let lastFocus = null;
-
-    const readState = () => {
-      try { return sessionStorage.getItem(PP_KEY) || localStorage.getItem(PP_KEY) || ppMemory; } catch { return ppMemory; }
-    };
-    const writeState = (kind) => {
-      ppMemory = `${kind}:${Date.now()}`;
-      try { (kind === 'claimed' ? localStorage : sessionStorage).setItem(PP_KEY, ppMemory); }
-      catch { /* Memory fallback covers this visit. */ }
-    };
-    const [savedKind, savedAt] = readState().split(':');
-    const quietFor = savedKind === 'claimed' ? 30 * DAY : Infinity;
-    const suppressed = Boolean(savedKind) && Date.now() - (parseInt(savedAt, 10) || 0) < quietFor;
-    const forced = new URLSearchParams(location.search).has('partner');
 
     // Damped pendulum: runs only while the badge is moving, then stops its frame loop.
     let angle = 0, velocity = 0, swingFrame = 0, lastTick = 0;
@@ -496,7 +478,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function openPass() {
       if (pp.open) return;
-      shownThisVisit = true;
       lastFocus = document.activeElement;
       setMenu(false);
       reopen.hidden = true;
@@ -509,7 +490,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     function closePass(kind = 'dismissed') {
       if (!pp.open || pp.classList.contains('is-closing')) return;
-      writeState(kind);
       const finish = () => {
         pp.classList.remove('is-closing');
         pp.close();
@@ -552,12 +532,8 @@ document.addEventListener('DOMContentLoaded', () => {
       }, motionPreference.matches ? 0 : 340);
     });
 
-    // Open right after the page loader fades; `?partner` campaign links always open it.
-    if (forced || !suppressed) {
-      setTimeout(() => { if (!shownThisVisit) openPass(); }, 600);
-    } else {
-      reopen.hidden = savedKind === 'claimed';
-    }
+    // Open right after the page loader fades, on every load.
+    setTimeout(openPass, 600);
   }
 
   // Log unhandled JS errors (unusual JS exceptions may indicate tampering)
