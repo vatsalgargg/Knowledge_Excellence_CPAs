@@ -1586,6 +1586,44 @@ a,button {
   .faq-item p { padding-right: 0; }
 }
 
+/* Intro video */
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.hero-video-link { display: inline-flex; align-items: center; gap: .75rem; min-height: 44px; margin-top: 1.1rem; padding: 0; border: 0; background: none; cursor: pointer; font: 500 .9rem/1.2 var(--font-sans); color: #e6ecec; }
+.hero-video-icon { display: grid; place-items: center; width: 36px; height: 36px; border: 1px solid #ed945e80; border-radius: 50%; color: #ed945e; font-size: .7rem; transition: background .25s, color .25s; }
+.hero-video-icon i { translate: 1px 0; }
+.hero-video-link:hover { color: #fff; }
+.hero-video-link:hover .hero-video-icon { background: #ed945e; color: var(--ink); }
+.intro-video { margin: clamp(2.5rem,5vw,4rem) 0 0; }
+.intro-video-frame { position: relative; overflow: hidden; aspect-ratio: 16 / 9; border: 1px solid #ffffff20; border-radius: 1.5rem; background: #0b1d24; box-shadow: 0 40px 80px -40px rgb(0 0 0 / .6); }
+.intro-video-frame video { display: block; width: 100%; height: 100%; object-fit: cover; background: #0b1d24; }
+.intro-video-play { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1rem; width: 100%; padding: 0; border: 0; cursor: pointer; background: linear-gradient(0deg, rgb(8 20 26 / .55), rgb(8 20 26 / .05) 55%); color: var(--paper); }
+.intro-video-play[hidden] { display: none; }
+.intro-video-btn { display: grid; place-items: center; width: clamp(64px,8vw,96px); height: clamp(64px,8vw,96px); border-radius: 50%; background: linear-gradient(110deg,#df8956,#f4ba8d); color: var(--ink); font-size: clamp(1.1rem,1.6vw,1.5rem); box-shadow: 0 20px 40px -16px rgb(0 0 0 / .6); transition: transform .3s var(--ease); }
+.intro-video-btn i { translate: 3px 0; }
+.intro-video-play:hover .intro-video-btn { transform: scale(1.06); }
+.intro-video-meta { padding: .45rem .9rem; border: 1px solid #ffffff30; border-radius: 999px; background: rgb(16 42 52 / .6); backdrop-filter: blur(10px); font: 600 .78rem/1 var(--font-sans); letter-spacing: .08em; text-transform: uppercase; }
+.intro-video-meta b { color: #ed945e; font-weight: 600; }
+.intro-video figcaption { margin-top: 1rem; color: #c8d4d3; font-size: 14px; line-height: 1.7; }
+.video-modal { position: fixed; inset: 0; width: 100%; height: 100%; max-width: none; max-height: none; margin: 0; padding: 0; border: 0; background: transparent; overflow: hidden; }
+.video-modal[open] { display: grid; place-items: center; animation: pp-fade .35s var(--ease) both; }
+.video-modal::backdrop { background: rgb(8 22 28 / .88); backdrop-filter: blur(6px); }
+.video-modal-frame { width: min(92vw, calc(84vh * 16 / 9)); aspect-ratio: 16 / 9; overflow: hidden; border-radius: 1.25rem; background: #0b1d24; box-shadow: 0 40px 100px -30px rgb(0 0 0 / .8); }
+.video-modal-frame video { display: block; width: 100%; height: 100%; }
+.video-modal-close { position: fixed; top: max(16px, env(safe-area-inset-top)); right: 16px; z-index: 2; display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid rgb(245 242 235 / .25); border-radius: 50%; cursor: pointer; background: rgb(10 27 33 / .7); color: var(--paper); transition: background .25s; }
+.video-modal-close:hover { background: var(--copper); }
+.video-modal-close svg { width: 18px; height: 18px; fill: none; }
+.video-modal :focus-visible { outline: 2px solid var(--orange); outline-offset: 3px; }
+.pp-watch { display: inline-flex; align-items: center; gap: .5rem; min-height: 44px; margin: .6rem 1.25rem 0 0; padding: 0; border: 0; background: none; cursor: pointer; font: 600 .85rem var(--font-sans); color: var(--orange); }
+.pp-watch:hover { color: var(--paper); }
+@media (max-width: 760px) {
+  .intro-video-frame { border-radius: 1rem; }
+  .video-modal-frame { width: 100vw; border-radius: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .video-modal[open] { animation: none; }
+  .intro-video-btn, .hero-video-icon { transition: none; }
+}
+
 /* ── PARTNER PASS POPUP ───────────────────────────────────── */
 html.pp-open { overflow: hidden; }
 .pp {
@@ -1762,3 +1800,4 @@ html.pp-open { overflow: hidden; }
   .pp-swing { transform: none; }
   .pp-close, .pp-cta, .pp-cta i, .pp-card-status path, .pp-card-status circle { transition: none; }
 }
+.visitor-counter img { vertical-align: middle; border-radius: 4px; }

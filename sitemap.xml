@@ -1,9 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
+        xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
   <url>
     <loc>https://knowledgeexcellencecpa.com/</loc>
-    <lastmod>2026-10-17</lastmod>
+    <lastmod>2026-10-22</lastmod>
+    <video:video>
+      <video:thumbnail_loc>https://knowledgeexcellencecpa.com/kecpa-video-poster.webp</video:thumbnail_loc>
+      <video:title>Knowledge Excellence CPAs: Your Accounting Delivery Partner in India</video:title>
+      <video:description>A 45-second introduction for U.S. CPA firms: offshore reconciliations, month-end close, payroll, reporting, and tax advisory from Bangalore, India, led by U.S. dual-licensed CPAs.</video:description>
+      <video:content_loc>https://knowledgeexcellencecpa.com/kecpa-video-1080.mp4</video:content_loc>
+      <video:duration>45</video:duration>
+      <video:publication_date>2026-10-22</video:publication_date>
+    </video:video>
     <changefreq>monthly</changefreq>
     <priority>1.0</priority>
     <image:image><image:loc>https://knowledgeexcellencecpa.com/og-image.jpg</image:loc></image:image>
@@ -15,14 +24,14 @@
     <image:image><image:loc>https://knowledgeexcellencecpa.com/financial-bookkeeping.webp</image:loc></image:image>
   </url>
   <url>
-    <loc>https://knowledgeexcellencecpa.com/privacy.html</loc>
-    <lastmod>2026-10-17</lastmod>
+    <loc>https://knowledgeexcellencecpa.com/privacy</loc>
+    <lastmod>2026-10-22</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://knowledgeexcellencecpa.com/terms.html</loc>
-    <lastmod>2026-10-17</lastmod>
+    <loc>https://knowledgeexcellencecpa.com/terms</loc>
+    <lastmod>2026-10-22</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>

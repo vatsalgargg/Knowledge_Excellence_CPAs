@@ -1,0 +1,41 @@
+/* Self-hosted web fonts (Latin). Inter and Playfair Display: SIL Open Font License 1.1.
+   Variable files, so one file serves every weight the site uses. */
+@font-face { font-family: 'Inter'; font-style: normal; font-weight: 100 900; font-display: swap; src: url('fonts/inter-latin.woff2') format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: 'Playfair Display'; font-style: normal; font-weight: 400 900; font-display: swap; src: url('fonts/playfair-latin.woff2') format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: 'Playfair Display'; font-style: italic; font-weight: 400 900; font-display: swap; src: url('fonts/playfair-italic-latin.woff2') format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+
+/* Font Awesome Free 6.5.0 (Font: SIL OFL 1.1, CSS: MIT) — subset of the icons this site uses.
+   Regenerate with fa_subset.py when an icon is added. */
+@font-face { font-family: 'Font Awesome 6 Free'; font-style: normal; font-weight: 900; font-display: block; src: url('fonts/fa-icons.woff2') format('woff2'); }
+.fa, .fas { display: inline-block; font-family: 'Font Awesome 6 Free'; font-weight: 900; font-style: normal; font-variant: normal; line-height: 1; text-rendering: auto; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+.fa-arrow-right::before { content: "\f061"; }
+.fa-balance-scale::before { content: "\f24e"; }
+.fa-briefcase::before { content: "\f0b1"; }
+.fa-building::before { content: "\f1ad"; }
+.fa-calculator::before { content: "\f1ec"; }
+.fa-chevron-right::before { content: "\f054"; }
+.fa-chevron-up::before { content: "\f077"; }
+.fa-circle-play::before { content: "\f144"; }
+.fa-clock::before { content: "\f017"; }
+.fa-comments::before { content: "\f086"; }
+.fa-diagram-project::before { content: "\f542"; }
+.fa-envelope::before { content: "\f0e0"; }
+.fa-eye::before { content: "\f06e"; }
+.fa-file-invoice-dollar::before { content: "\f571"; }
+.fa-gavel::before { content: "\f0e3"; }
+.fa-globe::before { content: "\f0ac"; }
+.fa-id-badge::before { content: "\f2c1"; }
+.fa-lock::before { content: "\f023"; }
+.fa-magnifying-glass-chart::before { content: "\e522"; }
+.fa-magnifying-glass-dollar::before { content: "\f688"; }
+.fa-map-marker-alt::before { content: "\f3c5"; }
+.fa-paper-plane::before { content: "\f1d8"; }
+.fa-people-group::before { content: "\e533"; }
+.fa-phone::before { content: "\f095"; }
+.fa-phone-alt::before { content: "\f879"; }
+.fa-play::before { content: "\f04b"; }
+.fa-scale-balanced::before { content: "\f24e"; }
+.fa-shield-halved::before { content: "\f3ed"; }
+.fa-spinner::before { content: "\f110"; }
+.fa-thumbs-up::before { content: "\f164"; }
+.fa-user-tie::before { content: "\f508"; }

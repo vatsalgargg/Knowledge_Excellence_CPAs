@@ -407,6 +407,70 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // ── INTRO VIDEO ───────────────────────────────────────────────────────────
+  // Nothing ever autoplays: each player shows its cover and a branded play button,
+  // and starts only when that button is pressed. Without JS, native controls remain.
+  const introVideo = document.getElementById('introVideo');
+  // Covers load only when a player is about to be seen, so they never compete
+  // with the first paint on slow connections.
+  const loadPoster = video => { if (video?.dataset.poster && !video.poster) video.poster = video.dataset.poster; };
+  if (introVideo) {
+    if ('IntersectionObserver' in window) {
+      const posterObserver = new IntersectionObserver(entries => {
+        if (entries.some(entry => entry.isIntersecting)) { loadPoster(introVideo); posterObserver.disconnect(); }
+      }, { rootMargin: '800px 0px' });
+      posterObserver.observe(introVideo);
+    } else {
+      loadPoster(introVideo);
+    }
+  }
+  document.querySelectorAll('.intro-video-frame').forEach(frame => {
+    const video = frame.querySelector('video');
+    const play = frame.querySelector('.intro-video-play');
+    if (!video || !play) return;
+    video.controls = false;
+    play.hidden = false;
+    play.addEventListener('click', () => {
+      play.hidden = true;
+      video.controls = true;
+      video.play().catch(() => {});
+      video.focus({ preventScroll: true });
+    });
+  });
+
+  // Pop-up player for the hero and Partner Pass links. It opens on the cover;
+  // closing (×, Esc or backdrop) always pauses.
+  const videoModal = document.getElementById('videoModal');
+  const modalVideo = document.getElementById('modalVideo');
+  if (videoModal && modalVideo && typeof videoModal.showModal === 'function') {
+    let videoReturn = null;
+    const openVideo = () => {
+      videoReturn = document.activeElement;
+      introVideo?.pause();
+      setMenu(false);
+      document.documentElement.classList.add('pp-open');
+      loadPoster(modalVideo);
+      videoModal.showModal();
+      videoModal.querySelector('.intro-video-play:not([hidden])')?.focus();
+    };
+    const closeVideo = () => videoModal.close();
+    videoModal.addEventListener('close', () => {
+      modalVideo.pause();
+      document.documentElement.classList.remove('pp-open');
+      videoReturn?.focus?.({ preventScroll: true });
+    });
+    document.getElementById('videoModalClose').addEventListener('click', closeVideo);
+    videoModal.addEventListener('click', event => { if (event.target === videoModal) closeVideo(); });
+    document.querySelectorAll('[data-video-open]').forEach(button => button.addEventListener('click', () => {
+      if (document.getElementById('partnerPass')?.open) {
+        document.dispatchEvent(new CustomEvent('kecpa:close-pass'));
+        setTimeout(openVideo, motionPreference.matches ? 0 : 340);
+      } else {
+        openVideo();
+      }
+    }));
+  }
+
   // ── PARTNER PASS POPUP ────────────────────────────────────────────────────
   // Outreach to CPA firms outside India. Opens on every page load, including refreshes.
   // Nothing is stored; the typed firm name never leaves the page unless the visitor
@@ -505,6 +569,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     pp.addEventListener('cancel', event => { event.preventDefault(); closePass(); });
+    document.addEventListener('kecpa:close-pass', () => closePass());
     document.getElementById('ppClose').addEventListener('click', () => closePass());
     document.getElementById('ppLater').addEventListener('click', () => closePass());
     stage.addEventListener('click', event => {

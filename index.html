@@ -139,7 +139,21 @@
           "inLanguage": "en-US",
           "isPartOf": { "@id": "https://knowledgeexcellencecpa.com/#website" },
           "about": { "@id": "https://knowledgeexcellencecpa.com/#organization" },
-          "primaryImageOfPage": "https://knowledgeexcellencecpa.com/og-image.jpg"
+          "primaryImageOfPage": "https://knowledgeexcellencecpa.com/og-image.jpg",
+          "video": { "@id": "https://knowledgeexcellencecpa.com/#intro-video" }
+        },
+        {
+          "@type": "VideoObject",
+          "@id": "https://knowledgeexcellencecpa.com/#intro-video",
+          "name": "Knowledge Excellence CPAs: Your Accounting Delivery Partner in India",
+          "description": "A 45-second introduction for U.S. CPA firms: offshore reconciliations, month-end close, payroll, reporting, and tax advisory from Bangalore, India, led by U.S. dual-licensed CPAs.",
+          "thumbnailUrl": "https://knowledgeexcellencecpa.com/kecpa-video-poster.webp",
+          "contentUrl": "https://knowledgeexcellencecpa.com/kecpa-video-1080.mp4",
+          "embedUrl": "https://knowledgeexcellencecpa.com/#outsourcing",
+          "uploadDate": "2026-10-22",
+          "duration": "PT45S",
+          "inLanguage": "en-US",
+          "publisher": { "@id": "https://knowledgeexcellencecpa.com/#organization" }
         },
         {
           "@type": "FAQPage",
@@ -158,22 +172,14 @@
       ]
     }
     </script>
-    <!-- Preconnects -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
-    <!-- Fonts: only weights actually used -->
-    <link
-        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;1,400&family=Inter:wght@400;500;600&display=swap"
-        rel="stylesheet">
-    <!-- Font Awesome: synchronous — icons are critical UI elements -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <!-- Self-hosted fonts and icon subset: no third-party requests block the first paint -->
+    <link rel="stylesheet" href="/fonts.css">
     <link rel="canonical" href="https://knowledgeexcellencecpa.com/">
     <link rel="sitemap" type="application/xml" href="/sitemap.xml">
     <!-- Favicon -->
-    <link rel="icon" type="image/png" href="/logo-modified.png">
-    <link rel="shortcut icon" type="image/png" href="/logo-modified.png">
-    <link rel="apple-touch-icon" href="/logo-modified.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     <link rel="stylesheet" href="index.css">
 </head>
 
@@ -203,7 +209,7 @@
     <header class="navbar" id="navbar">
         <div class="container nav-container">
             <a href="#home" class="logo">
-                <img src="logo.png" alt="Knowledge Excellence CPAs Logo" class="logo-img" fetchpriority="high"
+                <img src="logo-mark.webp" alt="Knowledge Excellence CPAs Logo" class="logo-img"
                     loading="eager" decoding="async" width="42" height="42">
                 <span class="logo-name">
                     <span class="logo-text">Knowledge Excellence</span>
@@ -249,6 +255,10 @@
                             Explore Services <i class="fas fa-arrow-right"></i>
                         </a>
                     </div>
+                    <button type="button" class="hero-video-link" data-video-open>
+                        <span class="hero-video-icon"><i class="fas fa-play" aria-hidden="true"></i></span>
+                        Watch our 45-sec intro
+                    </button>
                     <div class="trust-badges">
                         <span class="trust-badge"><i class="fas fa-scale-balanced"></i> U.S. GAAP Compliant</span>
                         <span class="trust-badge"><i class="fas fa-globe"></i> IFRS Compliant</span>
@@ -282,7 +292,7 @@
                             compliance, and insight-driven decisions.</p>
                         <a href="#contact" class="service-link">Get Started <i class="fas fa-arrow-right"></i></a>
                     </div>
-                    <div class="service-card reveal-up" style="transition-delay:0.1s"><img class="service-mobile-photo" src="financial-tax.webp" srcset="financial-tax-small.webp 560w, financial-tax.webp 1122w" sizes="(max-width: 760px) 92vw, 46vw" alt="Illustrative tax preparation workspace" width="1122" height="1402" loading="lazy"  decoding="async">
+                    <div class="service-card reveal-up"><img class="service-mobile-photo" src="financial-tax.webp" srcset="financial-tax-small.webp 560w, financial-tax.webp 1122w" sizes="(max-width: 760px) 92vw, 46vw" alt="Illustrative tax preparation workspace" width="1122" height="1402" loading="lazy"  decoding="async">
                         <div class="service-card-top">
                             <div class="service-icon-wrap"><i class="fas fa-balance-scale"></i></div>
                             <span class="service-tag">Popular</span>
@@ -293,7 +303,7 @@
                             international tax laws.</p>
                         <a href="#contact" class="service-link">Get Started <i class="fas fa-arrow-right"></i></a>
                     </div>
-                    <div class="service-card reveal-up" style="transition-delay:0.15s"><img class="service-mobile-photo" src="financial-advisory.webp" srcset="financial-advisory-small.webp 560w, financial-advisory.webp 1122w" sizes="(max-width: 760px) 92vw, 46vw" alt="Illustrative empty advisory room with financial reports" width="1122" height="1402" loading="lazy"  decoding="async">
+                    <div class="service-card reveal-up"><img class="service-mobile-photo" src="financial-advisory.webp" srcset="financial-advisory-small.webp 560w, financial-advisory.webp 1122w" sizes="(max-width: 760px) 92vw, 46vw" alt="Illustrative empty advisory room with financial reports" width="1122" height="1402" loading="lazy"  decoding="async">
                         <div class="service-card-top">
                             <div class="service-icon-wrap"><i class="fas fa-magnifying-glass-dollar"></i></div>
                             <span class="service-tag">Compliance</span>
@@ -303,7 +313,7 @@
                             business fully protected.</p>
                         <a href="#contact" class="service-link">Get Started <i class="fas fa-arrow-right"></i></a>
                     </div>
-                    <div class="service-card reveal-up" style="transition-delay:0.2s"><img class="service-mobile-photo" src="financial-bookkeeping.webp" srcset="financial-bookkeeping-small.webp 560w, financial-bookkeeping.webp 1122w" sizes="(max-width: 760px) 92vw, 46vw" alt="Illustrative bookkeeping workspace" width="1122" height="1402" loading="lazy"  decoding="async">
+                    <div class="service-card reveal-up"><img class="service-mobile-photo" src="financial-bookkeeping.webp" srcset="financial-bookkeeping-small.webp 560w, financial-bookkeeping.webp 1122w" sizes="(max-width: 760px) 92vw, 46vw" alt="Illustrative bookkeeping workspace" width="1122" height="1402" loading="lazy"  decoding="async">
                         <div class="service-card-top">
                             <div class="service-icon-wrap"><i class="fas fa-calculator"></i></div>
                             <span class="service-tag">Essential</span>
@@ -313,7 +323,7 @@
                             growing your business.</p>
                         <a href="#contact" class="service-link">Get Started <i class="fas fa-arrow-right"></i></a>
                     </div>
-                    <div class="service-card reveal-up" style="transition-delay:0.25s"><img class="service-mobile-photo" src="financial-advisory.webp" srcset="financial-advisory-small.webp 560w, financial-advisory.webp 1122w" sizes="(max-width: 760px) 92vw, 46vw" alt="Illustrative financial planning table with reports and notebook" width="1122" height="1402" loading="lazy"  decoding="async">
+                    <div class="service-card reveal-up"><img class="service-mobile-photo" src="financial-advisory.webp" srcset="financial-advisory-small.webp 560w, financial-advisory.webp 1122w" sizes="(max-width: 760px) 92vw, 46vw" alt="Illustrative financial planning table with reports and notebook" width="1122" height="1402" loading="lazy"  decoding="async">
                         <div class="service-card-top">
                             <div class="service-icon-wrap"><i class="fas fa-briefcase"></i></div>
                             <span class="service-tag">Advisory</span>
@@ -335,12 +345,12 @@
                     <div class="stat-label">U.S. Dual-Licensed CPAs (Montana & Washington State Boards)</div>
                 </div>
                 <div class="stat-divider"></div>
-                <div class="stat-item reveal-up" style="transition-delay:0.1s">
+                <div class="stat-item reveal-up">
                     <div class="stat-icon"><i class="fas fa-globe"></i></div>
                     <div class="stat-label">Global Delivery Model</div>
                 </div>
                 <div class="stat-divider"></div>
-                <div class="stat-item reveal-up" style="transition-delay:0.2s">
+                <div class="stat-item reveal-up">
                     <div class="stat-icon"><i class="fas fa-shield-halved"></i></div>
                     <div class="stat-label">GAAP Compliant</div>
                 </div>
@@ -407,21 +417,21 @@
                         deliverable.</p>
                 </div>
                 <div class="process-steps mt-5">
-                    <div class="process-step reveal-up"><img class="process-photo" src="financial-hero.webp" alt="Illustrative financial workspace and planning documents" width="1122" height="1402" loading="lazy" decoding="async"><div class="process-copy">
+                    <div class="process-step reveal-up"><img class="process-photo" src="financial-hero.webp" srcset="financial-hero-small.webp 560w, financial-hero.webp 1122w" sizes="(max-width: 760px) 92vw, 34vw" alt="Illustrative financial workspace and planning documents" width="1122" height="1402" loading="lazy" decoding="async"><div class="process-copy">
                         <div class="process-step-number">01</div>
                         <div class="process-step-icon"><i class="fas fa-comments"></i></div>
                         <h3>Free Consultation</h3>
                         <p>We begin with a no-obligation discovery call to understand your specific needs, timelines,
                             and goals.</p></div></div>
                     <div class="process-connector"><i class="fas fa-chevron-right"></i></div>
-                    <div class="process-step reveal-up" style="transition-delay:0.15s"><img class="process-photo" src="financial-accounting.webp" alt="Illustrative financial workspace and planning documents" width="1122" height="1402" loading="lazy" decoding="async"><div class="process-copy">
+                    <div class="process-step reveal-up"><img class="process-photo" src="financial-accounting.webp" srcset="financial-accounting-small.webp 560w, financial-accounting.webp 1122w" sizes="(max-width: 760px) 92vw, 34vw" alt="Illustrative financial workspace and planning documents" width="1122" height="1402" loading="lazy" decoding="async"><div class="process-copy">
                         <div class="process-step-number">02</div>
                         <div class="process-step-icon"><i class="fas fa-magnifying-glass-chart"></i></div>
                         <h3>Deep Analysis</h3>
                         <p>Our CPA team reviews your financial landscape and designs a tailored compliance and growth
                             strategy.</p></div></div>
                     <div class="process-connector"><i class="fas fa-chevron-right"></i></div>
-                    <div class="process-step reveal-up" style="transition-delay:0.3s"><img class="process-photo" src="financial-advisory.webp" alt="Illustrative financial workspace and planning documents" width="1122" height="1402" loading="lazy" decoding="async"><div class="process-copy">
+                    <div class="process-step reveal-up"><img class="process-photo" src="financial-advisory.webp" srcset="financial-advisory-small.webp 560w, financial-advisory.webp 1122w" sizes="(max-width: 760px) 92vw, 34vw" alt="Illustrative financial workspace and planning documents" width="1122" height="1402" loading="lazy" decoding="async"><div class="process-copy">
                         <div class="process-step-number">03</div>
                         <div class="process-step-icon"><i class="fas fa-paper-plane"></i></div>
                         <h3>Precise Delivery</h3>
@@ -449,6 +459,27 @@
                             engagement around your workflow, software, and deadlines.</p>
                     </div>
                 </div>
+                <!-- Intro video: nothing downloads until play; same files as the #videoModal player. -->
+                <figure class="intro-video reveal-up">
+                    <div class="intro-video-frame">
+                        <video id="introVideo" controls preload="none" playsinline width="1920" height="1080"
+                            data-poster="kecpa-video-poster.webp"
+                            aria-label="Knowledge Excellence CPAs: offshore accounting partnership for CPA firms (45 seconds)">
+                            <source src="kecpa-video-720.av1.mp4" type='video/mp4; codecs="av01.0.08M.10, opus"' media="(max-width: 760px)">
+                            <source src="kecpa-video-1080.av1.mp4" type='video/mp4; codecs="av01.0.08M.10, opus"'>
+                            <source src="kecpa-video-720.mp4" type="video/mp4" media="(max-width: 760px)">
+                            <source src="kecpa-video-1080.mp4" type="video/mp4">
+                            <track kind="captions" src="kecpa-video.en.vtt" srclang="en" label="English" default>
+                        </video>
+                        <button type="button" class="intro-video-play" hidden>
+                            <span class="intro-video-btn"><i class="fas fa-play" aria-hidden="true"></i></span>
+                            <span class="intro-video-meta">Watch <b>·</b> 45 sec <b>·</b> CC</span>
+                            <span class="sr-only">Play the 45-second intro video</span>
+                        </button>
+                    </div>
+                    <figcaption>How we work with U.S. CPA firms — reconciliations, payroll, reporting, and tax
+                        advisory, delivered from Bangalore, India.</figcaption>
+                </figure>
                 <div class="outsourcing-grid">
                     <article class="outsourcing-card reveal-up">
                         <i class="fas fa-people-group" aria-hidden="true"></i>
@@ -653,7 +684,7 @@
             <div class="container footer-grid">
                 <div class="footer-brand">
                     <a href="#home" class="logo footer-logo">
-                        <img src="logo.png" alt="Knowledge Excellence CPAs Logo" class="logo-img">
+                        <img src="logo-mark.webp" alt="Knowledge Excellence CPAs Logo" class="logo-img" width="42" height="42" loading="lazy" decoding="async">
                         <span class="logo-name">
                             <span class="logo-text">Knowledge Excellence</span>
                             <span class="logo-accent">CPAs</span>
@@ -663,8 +694,7 @@
                         expertise &amp; empowering financial growth — with integrity, precision, and care.</p>
                     <div class="visitor-counter">
                         <i class="fas fa-eye"></i>
-                        <img id="visitorBadge" alt="Visitor Count" height="20"
-                            style="vertical-align:middle;border-radius:4px;">
+                        <img id="visitorBadge" alt="Visitor Count" height="20" loading="lazy" decoding="async">
                     </div>
                 </div>
                 <div class="footer-col">
@@ -685,8 +715,8 @@
                         <li><a href="#process">Our Process</a></li>
                         <li><a href="#faq">FAQs</a></li>
                         <li><a href="#contact">Contact</a></li>
-                        <li><a href="/privacy.html">Privacy Policy</a></li>
-                        <li><a href="/terms.html">Terms &amp; Conditions</a></li>
+                        <li><a href="/privacy">Privacy Policy</a></li>
+                        <li><a href="/terms">Terms &amp; Conditions</a></li>
                     </ul>
                 </div>
                 <div class="footer-col">
@@ -740,7 +770,7 @@
                         <div class="pp-card">
                             <span class="pp-slot"></span>
                             <div class="pp-card-brand">
-                                <img src="logo.png" alt="" width="30" height="30">
+                                <img src="logo-mark.webp" alt="" width="30" height="30" loading="lazy" decoding="async">
                                 <span>Knowledge Excellence <em>CPAs</em></span>
                             </div>
                             <p class="pp-card-title">Partner Pass</p>
@@ -782,9 +812,34 @@
                         <span><i class="fas fa-clock" aria-hidden="true"></i> 24-hour response</span>
                         <span><i class="fas fa-scale-balanced" aria-hidden="true"></i> U.S. GAAP</span>
                     </div>
+                    <button type="button" class="pp-watch" data-video-open>
+                        <i class="fas fa-circle-play" aria-hidden="true"></i> Watch how we work (45 sec)
+                    </button>
                     <button type="button" class="pp-later" id="ppLater">Maybe later</button>
                 </div>
             </div>
+        </div>
+    </dialog>
+    <!-- VIDEO POP-UP: opened by every [data-video-open] button -->
+    <dialog class="video-modal" id="videoModal" aria-label="Knowledge Excellence CPAs intro video">
+        <button type="button" class="video-modal-close" id="videoModalClose" aria-label="Close video">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+        <div class="video-modal-frame intro-video-frame">
+            <video id="modalVideo" controls preload="none" playsinline width="1920" height="1080"
+                data-poster="kecpa-video-poster.webp"
+                aria-label="Knowledge Excellence CPAs: offshore accounting partnership for CPA firms (45 seconds)">
+                <source src="kecpa-video-720.av1.mp4" type='video/mp4; codecs="av01.0.08M.10, opus"' media="(max-width: 760px)">
+                <source src="kecpa-video-1080.av1.mp4" type='video/mp4; codecs="av01.0.08M.10, opus"'>
+                <source src="kecpa-video-720.mp4" type="video/mp4" media="(max-width: 760px)">
+                <source src="kecpa-video-1080.mp4" type="video/mp4">
+                <track kind="captions" src="kecpa-video.en.vtt" srclang="en" label="English" default>
+            </video>
+            <button type="button" class="intro-video-play" hidden>
+                <span class="intro-video-btn"><i class="fas fa-play" aria-hidden="true"></i></span>
+                <span class="intro-video-meta">Watch <b>·</b> 45 sec <b>·</b> CC</span>
+                <span class="sr-only">Play the 45-second intro video</span>
+            </button>
         </div>
     </dialog>
     <button type="button" class="pp-reopen" id="ppReopen" hidden>

@@ -8,7 +8,9 @@
   X-XSS-Protection: 1; mode=block
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
-  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: https://images.unsplash.com https://hits.sh; connect-src 'self' https://formspree.io; frame-ancestors 'none'; base-uri 'self'; form-action https://formspree.io
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data: https://hits.sh; media-src 'self'; connect-src 'self' https://formspree.io; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action https://formspree.io; upgrade-insecure-requests
+  Cross-Origin-Opener-Policy: same-origin
+  X-Permitted-Cross-Domain-Policies: none
 
 # Content negotiation — tell caches that "/" can vary by Accept header.
 # The worker serves text/markdown to AI agents, text/html to browsers.

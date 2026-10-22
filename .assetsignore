@@ -27,3 +27,24 @@
 !/financial-tax-small.webp
 !/financial-bookkeeping.webp
 !/financial-bookkeeping-small.webp
+
+# Intro video (web sizes only; the 4K master stays in output/, never deployed)
+!/kecpa-video-1080.mp4
+!/kecpa-video-720.mp4
+!/kecpa-video-1080.av1.mp4
+!/kecpa-video-720.av1.mp4
+!/kecpa-video-poster.webp
+!/kecpa-video.en.vtt
+
+# Self-hosted fonts, icon subset, shared styles and small brand images
+!/fonts.css
+!/legal.css
+!/fonts/
+!/fonts/inter-latin.woff2
+!/fonts/playfair-latin.woff2
+!/fonts/playfair-italic-latin.woff2
+!/fonts/fa-icons.woff2
+!/logo-mark.webp
+!/favicon-32.png
+!/favicon-192.png
+!/apple-touch-icon.png

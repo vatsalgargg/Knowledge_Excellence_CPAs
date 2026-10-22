@@ -13,11 +13,16 @@ test('deployment allowlist excludes internal, nested and future secret files', (
     'financial-accounting.webp', 'financial-accounting-small.webp',
     'financial-advisory.webp', 'financial-advisory-small.webp',
     'financial-tax.webp', 'financial-tax-small.webp',
-    'financial-bookkeeping.webp', 'financial-bookkeeping-small.webp'];
+    'financial-bookkeeping.webp', 'financial-bookkeeping-small.webp',
+    'kecpa-video-1080.mp4', 'kecpa-video-720.mp4', 'kecpa-video-1080.av1.mp4', 'kecpa-video-720.av1.mp4',
+    'kecpa-video-poster.webp', 'kecpa-video.en.vtt', 'fonts.css', 'legal.css', 'fonts/inter-latin.woff2',
+    'fonts/playfair-latin.woff2', 'fonts/playfair-italic-latin.woff2', 'fonts/fa-icons.woff2',
+    'logo-mark.webp', 'favicon-32.png', 'favicon-192.png', 'apple-touch-icon.png'];
   const privateFiles = ['worker.js', 'wrangler.toml', 'package.json', 'package-lock.json',
     '.env', '.env.production', '.dev.vars', 'credentials.json', 'private.key',
     '.git/config', '_headers', '_redirects', 'RULES.md', 'scripts/security.test.js', 'src/main.tsx',
-    'node_modules/example/index.js', 'dist/index.html', '.well-known/private.json'];
+    'node_modules/example/index.js', 'dist/index.html', '.well-known/private.json',
+    'output/video/kecpa-partnership-4k.mp4', 'fonts/unreviewed.woff2'];
   const output = execFileSync('git', ['-c', `core.excludesFile=${resolve('.assetsignore')}`,
     'check-ignore', '--no-index', '--stdin'], {
     input: [...publicFiles, ...privateFiles].join('\n') + '\n', encoding: 'utf8',
@@ -79,4 +84,24 @@ test('HTML, markdown and custom 404 behavior remain intact', async () => {
   const missing = await worker.fetch(new Request('https://example.com/missing'), env);
   assert.equal(missing.status, 404);
   assert.equal(await missing.text(), 'Not found');
+});
+
+test('static media gets long cache headers while pages and code revalidate', async () => {
+  const env = { ASSETS: { fetch: async () => new Response('x', { headers: { 'X-Content-Type-Options': 'nosniff' } }) } };
+  const cacheOf = async path => (await worker.fetch(new Request(`https://example.com${path}`), env)).headers;
+  assert.equal((await cacheOf('/fonts/inter-latin.woff2')).get('Cache-Control'), 'public, max-age=31536000, immutable');
+  const video = await cacheOf('/kecpa-video-1080.mp4');
+  assert.match(video.get('Cache-Control'), /max-age=2592000/);
+  assert.equal(video.get('X-Content-Type-Options'), 'nosniff');
+  for (const path of ['/index.css', '/script.js', '/privacy']) assert.equal((await cacheOf(path)).get('Cache-Control'), null);
+});
+
+test('CSP allows no third-party styles, fonts or plugins', async () => {
+  const csp = readFileSync('_headers', 'utf8').match(/Content-Security-Policy: (.+)/)[1];
+  assert.match(csp, /style-src 'self';/);
+  assert.match(csp, /font-src 'self';/);
+  assert.match(csp, /object-src 'none'/);
+  const response = await worker.fetch(new Request('https://example.com/', { headers: { Accept: 'text/markdown' } }),
+    { ASSETS: { fetch: async () => new Response('# md') } });
+  assert.equal(response.headers.get('Content-Security-Policy'), csp, 'worker CSP must mirror _headers');
 });

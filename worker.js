@@ -47,14 +47,31 @@ const SECURITY_HEADERS = {
   "Content-Security-Policy":
     "default-src 'self'; " +
     "script-src 'self'; " +
-    "style-src 'self' https://fonts.googleapis.com https://cdnjs.cloudflare.com; " +
-    "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; " +
-    "img-src 'self' data: https://images.unsplash.com https://hits.sh; " +
+    "style-src 'self'; " +
+    "font-src 'self'; " +
+    "img-src 'self' data: https://hits.sh; " +
+    "media-src 'self'; " +
     "connect-src 'self' https://formspree.io; " +
+    "object-src 'none'; " +
     "frame-ancestors 'none'; " +
     "base-uri 'self'; " +
-    "form-action https://formspree.io",
+    "form-action https://formspree.io; " +
+    "upgrade-insecure-requests",
+  "Cross-Origin-Opener-Policy": "same-origin",
+  "X-Permitted-Cross-Domain-Policies": "none",
 };
+
+// ── Browser caching for static media ───────────────────────────────────────
+// Fonts never change in place (a new font gets a new file name), so they are
+// immutable for a year. Images, video and captions keep 30 days with background
+// revalidation. HTML, CSS and JS keep Cloudflare's default ETag revalidation so
+// a deploy is visible immediately.
+const IMMUTABLE_CACHE = "public, max-age=31536000, immutable";
+const MEDIA_CACHE = "public, max-age=2592000, stale-while-revalidate=604800";
+const cacheControlFor = path =>
+  path.startsWith("/fonts/") ? IMMUTABLE_CACHE
+    : /\.(?:webp|png|jpe?g|mp4|vtt)$/i.test(path) ? MEDIA_CACHE
+      : null;
 
 // ── RFC 8288 Link header for agent / crawler discovery ─────────────────────
 // Applied to every homepage response (both HTML and Markdown paths).
@@ -125,6 +142,17 @@ const site = {
         status: response.status,
         statusText: response.statusText,
         headers: newHeaders,
+      });
+    }
+
+    const cacheControl = response.ok ? cacheControlFor(path) : null;
+    if (cacheControl) {
+      const cachedHeaders = new Headers(response.headers);
+      cachedHeaders.set("Cache-Control", cacheControl);
+      return new Response(response.body, {
+        status: response.status,
+        statusText: response.statusText,
+        headers: cachedHeaders,
       });
     }
 

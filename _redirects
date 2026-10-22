@@ -1,10 +1,8 @@
 /index.html / 301
-/favicon.ico /logo.png 301
+/favicon.ico /favicon-32.png 301
 /security.txt /.well-known/security.txt 301
 /home /#home 301
 /about /#about 301
 /services /#services 301
 /process /#process 301
 /contact /#contact 301
-/privacy /privacy.html 301
-/terms /terms.html 301
