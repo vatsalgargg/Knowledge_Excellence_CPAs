@@ -81,13 +81,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const validators = {
     name(v) {
       if (!v || v.length < 2)  return 'Name must be at least 2 characters.';
-      if (v.length > 80)       return 'Name must be under 80 characters.';
+      if (v.length > 80)       return 'Name must be 80 characters or fewer.';
       if (!/^[A-Za-z\s'\-]+$/.test(v)) return 'Name may only contain letters, spaces, hyphens, and apostrophes.';
       return null;
     },
     phone(v) {
       if (!v || v.length < 7)  return 'Phone number must be at least 7 digits.';
-      if (v.length > 20)       return 'Phone number must be under 20 characters.';
+      if (v.length > 20)       return 'Phone number must be 20 characters or fewer.';
       if (!/^[\+]?[0-9\s\-\(\)]+$/.test(v)) return 'Enter a valid phone number.';
       return null;
     },
@@ -105,7 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
       return null;
     },
     message(v) {
-      if (v.length > 2000) return 'Message must be under 2000 characters.';
+      if (v.length > 2000) return 'Message must be 2,000 characters or fewer.';
       return null;
     }
   };
@@ -522,7 +522,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const message = document.getElementById('message');
       if (message && !message.value.trim()) {
         message.value = `Partner Pass request${firm ? ` from ${firm}` : ''}: we are a CPA firm outside India `
-          + 'interested in outsourcing bookkeeping, tax return preparation and advisory support.';
+          + 'interested in outsourcing bookkeeping, tax return preparation, and advisory support.';
         message.dispatchEvent(new Event('input', { bubbles: true }));
       }
       closePass('claimed');
