@@ -82,13 +82,13 @@ document.addEventListener('DOMContentLoaded', () => {
     name(v) {
       if (!v || v.length < 2)  return 'Name must be at least 2 characters.';
       if (v.length > 80)       return 'Name must be 80 characters or fewer.';
-      if (!/^[A-Za-z\s'\-]+$/.test(v)) return 'Name may only contain letters, spaces, hyphens, and apostrophes.';
+      if (!/^[A-Za-z\s'-]+$/.test(v)) return 'Name may only contain letters, spaces, hyphens, and apostrophes.';
       return null;
     },
     phone(v) {
       if (!v || v.length < 7)  return 'Phone number must be at least 7 digits.';
       if (v.length > 20)       return 'Phone number must be 20 characters or fewer.';
-      if (!/^[\+]?[0-9\s\-\(\)]+$/.test(v)) return 'Enter a valid phone number.';
+      if (!/^\+?[0-9\s()-]+$/.test(v)) return 'Enter a valid phone number.';
       return null;
     },
     email(v) {

@@ -91,6 +91,11 @@ createServer(async (req, res) => {
   try {
     const request = new Request(`http://127.0.0.1:${port}${req.url}`, { method: req.method, headers: req.headers });
     const response = await route(request);
+    // This server is plain HTTP. Production is HTTPS, where upgrade-insecure-requests
+    // changes nothing; here WebKit would rewrite every request to https and fail
+    // (Chromium and Firefox exempt localhost). The live smoke test checks the real CSP.
+    const csp = response.headers.get('Content-Security-Policy');
+    if (csp) response.headers.set('Content-Security-Policy', csp.replace(/;\s*upgrade-insecure-requests\b/, ''));
     res.writeHead(response.status, Object.fromEntries(response.headers));
     if (response.body) Readable.fromWeb(response.body).pipe(res); else res.end();
   } catch (error) {

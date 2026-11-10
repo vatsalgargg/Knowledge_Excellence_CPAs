@@ -25,7 +25,9 @@ test('deployment allowlist excludes internal, nested and future secret files', (
     'output/video/kecpa-partnership-4k.mp4', 'fonts/unreviewed.woff2',
     'cspell.json', '.cspell/project-words.txt', '.gitleaks.toml', '.htmlvalidate.json', '.languagetool/ignore.json',
     'playwright.config.mjs', 'tests/e2e/site.spec.mjs', 'scripts/check-site.mjs', 'scripts/serve-static.mjs',
-    'test-results/trace.zip', 'playwright-report/index.html'];
+    'test-results/trace.zip', 'playwright-report/index.html',
+    'eslint.config.mjs', '.stylelintrc.json', 'scripts/ci/changed-areas.mjs', 'scripts/check-lighthouse.mjs',
+    'tests/e2e/responsive.spec.mjs', 'lighthouse-report/mobile-home.html'];
   const output = execFileSync('git', ['-c', `core.excludesFile=${resolve('.assetsignore')}`,
     'check-ignore', '--no-index', '--stdin'], {
     input: [...publicFiles, ...privateFiles].join('\n') + '\n', encoding: 'utf8',
@@ -93,8 +95,8 @@ test('direct assets retain cache policy and only homepage routes run Worker firs
   const config = readFileSync('wrangler.toml', 'utf8');
   const routes = JSON.parse(config.match(/^run_worker_first = (.+)$/m)[1]);
   assert.deepEqual(routes, ['/', '/index', '/index.html']);
-  const headers = readFileSync('_headers', 'utf8');
-  assert.match(headers, /\/fonts\/\*\r?\n  Cache-Control: public, max-age=31536000, immutable/);
+  const headers = readFileSync('_headers', 'utf8').replace(/\r\n/g, '\n'); // Windows checkouts use CRLF
+  assert.match(headers, /\/fonts\/\*\r?\n {2}Cache-Control: public, max-age=31536000, immutable/);
   for (const ext of ['webp', 'png', 'jpg', 'jpeg', 'mp4', 'vtt']) {
     assert(headers.includes('/*.' + ext + '\n  Cache-Control: public, max-age=2592000, stale-while-revalidate=604800'));
   }

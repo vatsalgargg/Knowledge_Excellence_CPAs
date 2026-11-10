@@ -5,16 +5,28 @@ import AxeBuilder from '@axe-core/playwright';
 
 const PAGES = ['/', '/privacy', '/terms'];
 
+// Playwright's WebKit build styles native <select> controls with an inline style
+// attribute of its own, which the CSP reports. The site's markup has none, and
+// Chromium and Firefox enforce the same CSP, so only that report is ignored on WebKit.
+const isWebKitSelectQuirk = text => /Refused to apply a stylesheet because its hash, its nonce, or 'unsafe-inline'/.test(text);
+
 // Collect console errors, CSP violations and failed same-origin requests for a page.
 async function watch(page) {
   const problems = [];
-  await page.addInitScript(() => {
+  const webkit = page.context().browser()?.browserType().name() === 'webkit';
+  await page.addInitScript(webkitQuirk => {
     document.addEventListener('securitypolicyviolation', e => {
+      if (webkitQuirk && e.violatedDirective === 'style-src-attr' && e.target?.nodeName === 'SELECT' && !e.sourceFile) return;
       window.__cspViolations = window.__cspViolations || [];
       window.__cspViolations.push(`${e.violatedDirective} ${e.blockedURI}`);
     });
+  }, webkit);
+  page.on('console', msg => {
+    if (msg.type() !== 'error') return;
+    // Any genuine inline-style violation still reaches window.__cspViolations above.
+    if (webkit && isWebKitSelectQuirk(msg.text())) return;
+    problems.push(`console: ${msg.text()}`);
   });
-  page.on('console', msg => { if (msg.type() === 'error') problems.push(`console: ${msg.text()}`); });
   page.on('pageerror', err => problems.push(`exception: ${err.message}`));
   page.on('requestfailed', req => {
     if (req.url().startsWith('http://127.0.0.1') && !/net::ERR_ABORTED/.test(req.failure()?.errorText)) problems.push(`request failed: ${req.url()}`);
@@ -48,7 +60,7 @@ async function scrollThrough(page) {
   await page.evaluate(async () => {
     for (let y = 0; y < document.body.scrollHeight; y += innerHeight * 0.75) {
       scrollTo(0, y);
-      await new Promise(r => setTimeout(r, 80));
+      await new Promise(r => { setTimeout(r, 80); });
     }
     scrollTo(0, 0);
   });
@@ -188,10 +200,13 @@ test.describe('homepage journeys', () => {
     await expect(pass).toHaveAttribute('open', '');
   });
 
-  test('intro video never autoplays and plays only on click', async ({ page }) => {
+  test('intro video never autoplays and plays only on click', async ({ page, browserName }) => {
     await page.goto('/');
     await page.waitForTimeout(900);
-    const idle = await page.evaluate(() => [...document.querySelectorAll('video')].every(v => v.paused && v.readyState === 0));
+    // Playwright's desktop WebKit media stack ignores preload="none" (iOS Safari honors it),
+    // so the no-download half of this check runs on Chromium and Firefox only.
+    const idle = await page.evaluate(checkDownload => [...document.querySelectorAll('video')]
+      .every(v => v.paused && (!checkDownload || v.readyState === 0)), browserName !== 'webkit');
     expect(idle, 'no video plays or downloads on load').toBe(true);
     await page.locator('.hero-video-link').click();
     const modal = page.locator('#videoModal');
@@ -199,10 +214,14 @@ test.describe('homepage journeys', () => {
     expect(await page.locator('#modalVideo').evaluate(v => v.paused)).toBe(true);
     await modal.locator('.intro-video-play').click();
     await expect.poll(() => page.locator('#modalVideo').evaluate(v => !v.paused && v.currentTime > 0.2), { timeout: 10_000 }).toBe(true);
-    expect(await page.locator('#modalVideo').evaluate(v => v.textTracks[0]?.cues?.length ?? 0)).toBeGreaterThan(5);
+    // Safari follows the visitor's own caption setting instead of [default], so on
+    // WebKit the track is switched on (as the CC button would) before counting cues.
+    if (browserName === 'webkit') await page.locator('#modalVideo').evaluate(v => { v.textTracks[0].mode = 'showing'; });
+    await expect.poll(() => page.locator('#modalVideo').evaluate(v => v.textTracks[0]?.cues?.length ?? 0), { timeout: 5_000 }).toBeGreaterThan(5);
     await page.keyboard.press('Escape');
     await expect(modal).not.toHaveAttribute('open', '');
-    expect(await page.locator('#modalVideo').evaluate(v => v.paused)).toBe(true);
+    // The dialog fires 'close' (which pauses) a task after it loses [open].
+    await expect.poll(() => page.locator('#modalVideo').evaluate(v => v.paused), { timeout: 2_000 }).toBe(true);
     await expect(page.locator('html')).not.toHaveClass(/pp-open/);
   });
 

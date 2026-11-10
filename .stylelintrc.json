@@ -1,0 +1,29 @@
+{
+  "extends": [
+    "stylelint-config-recommended"
+  ],
+  "ignoreFiles": [
+    "node_modules/**",
+    "dist/**",
+    ".dist/**",
+    "output/**",
+    ".qa-output/**",
+    "src/**"
+  ],
+  "rules": {
+    "declaration-property-value-no-unknown": true,
+    "declaration-block-no-duplicate-properties": [
+      true,
+      {
+        "ignore": [
+          "consecutive-duplicates-with-different-syntaxes"
+        ]
+      }
+    ],
+    "color-no-invalid-hex": true,
+    "unit-no-unknown": true,
+    "media-feature-name-no-unknown": true,
+    "no-duplicate-selectors": null,
+    "no-descending-specificity": null
+  }
+}

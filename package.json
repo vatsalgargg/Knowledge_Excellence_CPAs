@@ -15,7 +15,11 @@
     "check:grammar": "node scripts/check-grammar.mjs",
     "lint:html": "html-validate index.html privacy.html terms.html 404.html",
     "lint:spelling": "cspell --no-progress",
-    "check": "npm run test:security && npm run check:site && npm run lint:html && npm run lint:spelling && npm run test:e2e"
+    "check": "npm run test:security && npm run lint:js && npm run lint:css && npm run check:site && npm run lint:html && npm run lint:spelling && npm run test:e2e",
+    "lint:js": "eslint .",
+    "lint:css": "stylelint \"*.css\"",
+    "test:responsive": "playwright test --project=responsive",
+    "check:lighthouse": "node scripts/check-lighthouse.mjs"
   },
   "dependencies": {
     "@vitejs/plugin-react": "6.1.2",
@@ -27,11 +31,18 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "4.14.0",
+    "@eslint/js": "9.39.5",
     "@playwright/test": "1.64.1",
     "autoprefixer": "10.6.1",
+    "chrome-launcher": "1.2.3",
     "cspell": "10.4.0",
+    "eslint": "9.39.5",
+    "globals": "17.13.0",
     "html-validate": "11.17.0",
+    "lighthouse": "13.5.0",
     "postcss": "8.5.30",
+    "stylelint": "17.16.0",
+    "stylelint-config-recommended": "18.0.0",
     "tailwindcss": "4.3.3",
     "typescript": "7.0.2",
     "vite": "8.3.4"

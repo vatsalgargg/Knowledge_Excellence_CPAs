@@ -7,6 +7,7 @@
 /* Font Awesome Free 6.5.0 (Font: SIL OFL 1.1, CSS: MIT) — subset of the icons this site uses.
    Regenerate with fa_subset.py when an icon is added. */
 @font-face { font-family: 'Font Awesome 6 Free'; font-style: normal; font-weight: 900; font-display: block; src: url('fonts/fa-icons.woff2') format('woff2'); }
+/* stylelint-disable-next-line font-family-no-missing-generic-family-keyword -- icon font has no generic fallback */
 .fa, .fas { display: inline-block; font-family: 'Font Awesome 6 Free'; font-weight: 900; font-style: normal; font-variant: normal; line-height: 1; text-rendering: auto; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
 .fa-arrow-right::before { content: "\f061"; }
 .fa-balance-scale::before { content: "\f24e"; }

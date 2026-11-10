@@ -2,11 +2,26 @@
 # Findings appear under Security > Code scanning.
 name: CodeQL
 
+# Runs only when code or workflows change; the weekly run scans everything regardless.
 on:
   push:
     branches: [main]
+    paths:
+      - "**/*.js"
+      - "**/*.mjs"
+      - "**/*.cjs"
+      - "**/*.ts"
+      - "**/*.tsx"
+      - ".github/workflows/**"
   pull_request:
     branches: [main]
+    paths:
+      - "**/*.js"
+      - "**/*.mjs"
+      - "**/*.cjs"
+      - "**/*.ts"
+      - "**/*.tsx"
+      - ".github/workflows/**"
   schedule:
     - cron: "41 4 * * 1"
   workflow_dispatch:
