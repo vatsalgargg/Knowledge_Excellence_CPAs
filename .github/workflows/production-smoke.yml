@@ -98,7 +98,9 @@ jobs:
 
       - name: Reject internal file exposure
         run: |
-          for path in worker.js wrangler.toml package.json package-lock.json _headers _redirects .env .dev.vars .git/config \n            RULES.md README.md scripts/security.test.js scripts/check-site.mjs playwright.config.mjs cspell.json .gitleaks.toml \n            .github/workflows/validate.yml output/video/kecpa-partnership-4k.mp4 node_modules/vite/package.json; do
+          for path in worker.js wrangler.toml package.json package-lock.json _headers _redirects .env .dev.vars .git/config \
+            RULES.md README.md scripts/security.test.js scripts/check-site.mjs playwright.config.mjs cspell.json .gitleaks.toml \
+            .github/workflows/validate.yml output/video/kecpa-partnership-4k.mp4 node_modules/vite/package.json; do
             status=$(curl --silent --show-error --output /dev/null --write-out '%{http_code}' "$SITE_URL/$path")
             if [ "$status" != "404" ]; then
               echo "Internal path /$path returned $status; expected 404"
@@ -109,7 +111,8 @@ jobs:
       - name: Check legal pages load without redirect loops
         run: |
           for page in privacy terms; do
-            final=$(curl --silent --show-error --location --max-redirs 3 --output /dev/null               --write-out '%{http_code} %{url_effective}' "$SITE_URL/$page.html")
+            final=$(curl --silent --show-error --location --max-redirs 3 --output /dev/null \
+              --write-out '%{http_code} %{url_effective}' "$SITE_URL/$page.html")
             if [ "$final" != "200 $SITE_URL/$page" ]; then
               echo "/$page.html ended at '$final'; expected '200 $SITE_URL/$page'"
               exit 1
