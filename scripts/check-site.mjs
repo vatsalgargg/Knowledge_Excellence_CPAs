@@ -186,6 +186,13 @@ if (process.argv.includes('--external')) {
     }
     try {
       const res = await fetch(url, { method: 'GET', redirect: 'follow', signal: AbortSignal.timeout(15000), headers: { 'User-Agent': 'KECPA link checker' } });
+      // A Cloudflare bot challenge (common for CI runners) means the host is up but
+      // won't answer a bot, so the link can't be verified from here: warn, don't fail.
+      if (res.headers.get('cf-mitigated') === 'challenge') {
+        const note = `${url} returned a Cloudflare bot challenge; not verified`;
+        console.log(process.env.GITHUB_ACTIONS ? `::warning title=Outbound link not verified::${note}` : `  ${note}`);
+        continue;
+      }
       if (res.status >= 400) fail('external', `${url} returned ${res.status}`);
     } catch (e) {
       fail('external', `${url} unreachable: ${e.message}`);

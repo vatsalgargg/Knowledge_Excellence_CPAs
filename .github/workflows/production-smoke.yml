@@ -34,7 +34,23 @@ jobs:
         if: inputs.wait-for-deploy
         run: sleep 90
 
+      # Cloudflare's bot protection challenges GitHub's data-centre IPs ("Just a moment..."),
+      # which says nothing about whether the site works. When that happens, skip the live
+      # checks with a warning instead of failing. To run them again, let this workflow
+      # through in Cloudflare (Security > WAF/Bots: skip rule for GitHub Actions traffic).
+      - name: Check Cloudflare lets this runner through
+        id: probe
+        run: |
+          mitigated=$(curl --silent --output /dev/null --dump-header - "$SITE_URL/" | grep -i '^cf-mitigated:' | tr -d '\r' || true)
+          if [ -n "$mitigated" ]; then
+            echo "::warning title=Live smoke checks skipped::Cloudflare served a bot challenge to this GitHub runner (${mitigated}), so the live site cannot be checked from here. Allow GitHub Actions through in Cloudflare to re-enable these checks."
+            echo "challenged=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "challenged=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Check homepage headers
+        if: steps.probe.outputs.challenged != 'true'
         run: |
           trap 'echo "::error title=${GITHUB_JOB} smoke step failed::line ${LINENO}: ${BASH_COMMAND}"' ERR
           headers=$(mktemp)
@@ -65,6 +81,7 @@ jobs:
           echo "Homepage is reachable and security headers are present"
 
       - name: Check security.txt
+        if: steps.probe.outputs.challenged != 'true'
         run: |
           trap 'echo "::error title=${GITHUB_JOB} smoke step failed::line ${LINENO}: ${BASH_COMMAND}"' ERR
           headers=$(mktemp)
@@ -80,6 +97,7 @@ jobs:
           echo "security.txt is reachable"
 
       - name: Check security.txt redirect
+        if: steps.probe.outputs.challenged != 'true'
         run: |
           trap 'echo "::error title=${GITHUB_JOB} smoke step failed::line ${LINENO}: ${BASH_COMMAND}"' ERR
           headers=$(mktemp)
@@ -107,6 +125,7 @@ jobs:
           echo "/security.txt redirects to /.well-known/security.txt"
 
       - name: Check robots and sitemap
+        if: steps.probe.outputs.challenged != 'true'
         run: |
           trap 'echo "::error title=${GITHUB_JOB} smoke step failed::line ${LINENO}: ${BASH_COMMAND}"' ERR
           curl --silent --show-error --fail "$SITE_URL/robots.txt" | grep -q '^Sitemap: https://knowledgeexcellencecpa.com/sitemap.xml$'
@@ -115,6 +134,7 @@ jobs:
           echo "robots.txt and sitemap.xml are reachable"
 
       - name: Reject internal file exposure
+        if: steps.probe.outputs.challenged != 'true'
         run: |
           trap 'echo "::error title=${GITHUB_JOB} smoke step failed::line ${LINENO}: ${BASH_COMMAND}"' ERR
           for path in worker.js wrangler.toml package.json package-lock.json _headers _redirects .env .dev.vars .git/config \
@@ -128,6 +148,7 @@ jobs:
           done
 
       - name: Check legal pages load without redirect loops
+        if: steps.probe.outputs.challenged != 'true'
         run: |
           trap 'echo "::error title=${GITHUB_JOB} smoke step failed::line ${LINENO}: ${BASH_COMMAND}"' ERR
           for page in privacy terms; do
@@ -141,6 +162,7 @@ jobs:
           echo "Legal pages load"
 
       - name: Check unknown pages return the branded 404
+        if: steps.probe.outputs.challenged != 'true'
         run: |
           trap 'echo "::error title=${GITHUB_JOB} smoke step failed::line ${LINENO}: ${BASH_COMMAND}"' ERR
           body=$(mktemp)
@@ -150,6 +172,7 @@ jobs:
           echo "404 page is served"
 
       - name: Check CSP and asset delivery
+        if: steps.probe.outputs.challenged != 'true'
         run: |
           trap 'echo "::error title=${GITHUB_JOB} smoke step failed::line ${LINENO}: ${BASH_COMMAND}"' ERR
           headers=$(mktemp)
@@ -166,6 +189,7 @@ jobs:
           echo "CSP and assets look right"
 
       - name: Check AI agents receive Markdown
+        if: steps.probe.outputs.challenged != 'true'
         run: |
           trap 'echo "::error title=${GITHUB_JOB} smoke step failed::line ${LINENO}: ${BASH_COMMAND}"' ERR
           curl --silent --show-error --fail --header 'Accept: text/markdown' "$SITE_URL/" | head -1 | grep -q '^# Knowledge Excellence CPAs'
