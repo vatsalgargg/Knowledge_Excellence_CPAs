@@ -447,7 +447,10 @@ document.addEventListener('DOMContentLoaded', () => {
       videoModal.showModal();
       videoModal.querySelector('.intro-video-play:not([hidden])')?.focus();
     };
-    const closeVideo = () => videoModal.close();
+    // Pause the moment closing starts: the dialog's 'close' event fires a task after it
+    // closes, so pausing only there let a moment of audio play on after Esc or ×.
+    const closeVideo = () => { modalVideo.pause(); videoModal.close(); };
+    videoModal.addEventListener('cancel', () => modalVideo.pause());
     videoModal.addEventListener('close', () => {
       modalVideo.pause();
       document.documentElement.classList.remove('pp-open');
