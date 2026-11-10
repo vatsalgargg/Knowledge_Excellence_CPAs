@@ -5,6 +5,7 @@
   --ink: #13272d;
   --navy: #102a34;
   --copper: #b5542e;
+  --copper-text: #9c4422; /* copper for small text on light backgrounds: 5.7:1, WCAG AA */
   --orange: #ed945e;
   --muted: #616968;
   --line: #d7d7cd;
@@ -1014,6 +1015,14 @@ a,button {
   font-size: 10px;
   color: #d8a783;
 }
+/* Inline brand mark (the icon font has no brand glyphs), sized and coloured like the icons above. */
+.footer-contact-list .footer-icon {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  fill: #d8a783;
+  align-self: center;
+}
 .footer a:hover {
   color: #e6ad82;
 }
@@ -1031,6 +1040,8 @@ a,button {
 }
 .footer-love .name {
   color: #d5b08f;
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 .scroll-top {
   width: 44px;
@@ -1491,7 +1502,7 @@ a,button {
 .text-center .section-subtitle { margin-inline: auto; }
 .process { background: transparent; color: var(--ink); border-radius: 2rem; width: min(calc(100% - 2rem),87rem); margin-inline: auto; overflow: visible; }
 .process .section-subtitle { color: var(--muted); }
-.process .section-eyebrow { color: var(--copper); }
+.process .section-eyebrow { color: var(--copper-text); }
 .process-steps { display: block; border-top: 0; padding-top: 0; perspective: none; }
 .process-steps::before { display: none; }
 .process-step,.process-step~.process-step { position: sticky; top: 48px; display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: clamp(1.5rem,4vw,4rem); min-height: 380px; padding: clamp(1.5rem,3vw,2.5rem); border: 1px solid #d7d7cd; border-radius: 1.25rem; background: var(--paper); color: var(--ink); margin-bottom: 56px; transform-origin: center top; }
@@ -1505,7 +1516,7 @@ a,button {
 .cta-banner { background: var(--paper); color: var(--ink); }
 .cta-title { font-size: clamp(2.4rem,1.3rem + 3vw,4.5rem); }
 .cta-subtitle { color: var(--muted); }
-.cta-banner .section-eyebrow { color: var(--copper); }
+.cta-banner .section-eyebrow { color: var(--copper-text); }
 .contact-form-container { background: #eae5db90; padding: clamp(1.5rem,3vw,2.5rem); border: 1px solid var(--line); border-radius: 1.5rem; }
 .form-group input,.form-group select,.form-group textarea { border-radius: .6rem; background: var(--paper); }
 .contact { padding-top: 1rem; }
@@ -1568,7 +1579,7 @@ a,button {
 /* FAQ */
 .faq-grid { display: grid; gap: clamp(2rem,5vw,5rem); align-items: start; }
 .faq-grid>* { min-width: 0; }
-.faq .section-eyebrow { color: var(--copper); }
+.faq .section-eyebrow { color: var(--copper-text); }
 .faq-list { border-top: 1px solid var(--line); }
 .faq-item { border-bottom: 1px solid var(--line); }
 .faq-item summary { display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; min-height: 44px; padding: 1.4rem 0; list-style: none; cursor: pointer; font: 400 clamp(1.15rem,1rem + .45vw,1.4rem)/1.35 var(--font-serif); color: var(--ink); }

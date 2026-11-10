@@ -1,0 +1,25 @@
+{
+  "extends": [
+    "html-validate:recommended",
+    "html-validate:a11y"
+  ],
+  "rules": {
+    "no-inline-style": "error",
+    "require-sri": "off",
+    "no-trailing-whitespace": "off",
+    "long-title": [
+      "error",
+      {
+        "maxlength": 80
+      }
+    ],
+    "tel-non-breaking": [
+      "error",
+      {
+        "ignoreClasses": [
+          "btn"
+        ]
+      }
+    ]
+  }
+}

@@ -22,7 +22,10 @@ test('deployment allowlist excludes internal, nested and future secret files', (
     '.env', '.env.production', '.dev.vars', 'credentials.json', 'private.key',
     '.git/config', '_headers', '_redirects', 'RULES.md', 'scripts/security.test.js', 'src/main.tsx',
     'node_modules/example/index.js', 'dist/index.html', '.well-known/private.json',
-    'output/video/kecpa-partnership-4k.mp4', 'fonts/unreviewed.woff2'];
+    'output/video/kecpa-partnership-4k.mp4', 'fonts/unreviewed.woff2',
+    'cspell.json', '.cspell/project-words.txt', '.gitleaks.toml', '.htmlvalidate.json', '.languagetool/ignore.json',
+    'playwright.config.mjs', 'tests/e2e/site.spec.mjs', 'scripts/check-site.mjs', 'scripts/serve-static.mjs',
+    'test-results/trace.zip', 'playwright-report/index.html'];
   const output = execFileSync('git', ['-c', `core.excludesFile=${resolve('.assetsignore')}`,
     'check-ignore', '--no-index', '--stdin'], {
     input: [...publicFiles, ...privateFiles].join('\n') + '\n', encoding: 'utf8',
@@ -86,14 +89,16 @@ test('HTML, markdown and custom 404 behavior remain intact', async () => {
   assert.equal(await missing.text(), 'Not found');
 });
 
-test('static media gets long cache headers while pages and code revalidate', async () => {
-  const env = { ASSETS: { fetch: async () => new Response('x', { headers: { 'X-Content-Type-Options': 'nosniff' } }) } };
-  const cacheOf = async path => (await worker.fetch(new Request(`https://example.com${path}`), env)).headers;
-  assert.equal((await cacheOf('/fonts/inter-latin.woff2')).get('Cache-Control'), 'public, max-age=31536000, immutable');
-  const video = await cacheOf('/kecpa-video-1080.mp4');
-  assert.match(video.get('Cache-Control'), /max-age=2592000/);
-  assert.equal(video.get('X-Content-Type-Options'), 'nosniff');
-  for (const path of ['/index.css', '/script.js', '/privacy']) assert.equal((await cacheOf(path)).get('Cache-Control'), null);
+test('direct assets retain cache policy and only homepage routes run Worker first', () => {
+  const config = readFileSync('wrangler.toml', 'utf8');
+  const routes = JSON.parse(config.match(/^run_worker_first = (.+)$/m)[1]);
+  assert.deepEqual(routes, ['/', '/index', '/index.html']);
+  const headers = readFileSync('_headers', 'utf8');
+  assert.match(headers, /\/fonts\/\*\r?\n  Cache-Control: public, max-age=31536000, immutable/);
+  for (const ext of ['webp', 'png', 'jpg', 'jpeg', 'mp4', 'vtt']) {
+    assert(headers.includes('/*.' + ext + '\n  Cache-Control: public, max-age=2592000, stale-while-revalidate=604800'));
+  }
+  for (const path of ['/*.html', '/*.css', '/*.js']) assert(!headers.includes(path));
 });
 
 test('CSP allows no third-party styles, fonts or plugins', async () => {

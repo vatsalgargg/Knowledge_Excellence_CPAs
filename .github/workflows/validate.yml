@@ -1,3 +1,7 @@
+# Main CI. Every push and pull request to main must pass all jobs before Cloudflare's
+# deploy is trusted; production-smoke.yml then checks the live site.
+# Actions are pinned to commit SHAs (Dependabot keeps them current); downloaded
+# tools are verified against pinned SHA-256 checksums before they run.
 name: Validate Static Site
 
 on:
@@ -10,73 +14,58 @@ on:
 permissions:
   contents: read
 
-jobs:
-  validate:
-    name: Validate static site
-    runs-on: ubuntu-latest
+concurrency:
+  group: validate-${{ github.ref }}
+  cancel-in-progress: true
 
+env:
+  NODE_VERSION: "22"
+
+jobs:
+  static:
+    name: Security, integrity and copy checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - name: Checkout code
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Set up Node.js
-        uses: actions/setup-node@v7
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: "22"
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
 
       - name: Install locked dependencies
         run: npm ci --ignore-scripts
 
-      - name: Audit dependencies
+      - name: Audit dependencies for vulnerabilities
         run: npm audit --audit-level=moderate
 
-      - name: Verify security boundaries
+      - name: Verify dependency signatures and provenance
+        run: npm audit signatures
+
+      - name: Verify security boundaries (unit tests)
         run: npm run test:security
 
       - name: Build site
         run: npm run build
-
-      - name: Check required files exist
-        run: |
-          files=(
-            "index.html"
-            "index.css"
-            "script.js"
-            "worker.js"
-            "wrangler.toml"
-            "_headers"
-            "_redirects"
-            "sitemap.xml"
-            "robots.txt"
-            ".well-known/security.txt"
-          )
-
-          for file in "${files[@]}"; do
-            if [ ! -f "$file" ]; then
-              echo "Missing required file: $file"
-              exit 1
-            fi
-            echo "Found: $file"
-          done
 
       - name: Check JavaScript syntax
         run: |
           node --check script.js
           node --check worker.js
 
-      - name: Check HTML metadata
-        run: |
-          size=$(wc -c < index.html)
-          if [ "$size" -lt 1000 ]; then
-            echo "index.html looks too small: $size bytes"
-            exit 1
-          fi
+      - name: Check deployed files (integrity, leaks, limits, CSP, SEO)
+        run: npm run check:site
 
-          grep -qi '<title>.*Knowledge Excellence CPAs' index.html
-          grep -qi 'name="description"' index.html
-          grep -qi 'rel="canonical"' index.html
+      - name: Validate HTML
+        run: npm run lint:html
 
-          echo "index.html metadata looks valid"
+      - name: Check spelling
+        run: npm run lint:spelling
 
       - name: Check Cloudflare config
         run: |
@@ -84,7 +73,7 @@ jobs:
           grep -q '^\[assets\]$' wrangler.toml
           grep -q '^directory = "\./"$' wrangler.toml
           grep -q '^binding = "ASSETS"$' wrangler.toml
-          grep -q '^run_worker_first = true$' wrangler.toml
+          grep -Fxq 'run_worker_first = ["/", "/index", "/index.html"]' wrangler.toml
 
           grep -q 'Strict-Transport-Security:' _headers
           grep -q 'Content-Security-Policy:' _headers
@@ -93,7 +82,7 @@ jobs:
 
           echo "Cloudflare config looks valid"
 
-      - name: Check security.txt
+      - name: Check security.txt (fails 30 days before expiry)
         run: |
           security_file=".well-known/security.txt"
 
@@ -111,27 +100,162 @@ jobs:
           expires = datetime.datetime.fromisoformat(value)
           now = datetime.datetime.now(datetime.timezone.utc)
 
-          if expires <= now:
-              raise SystemExit("security.txt Expires value is in the past")
+          if expires <= now + datetime.timedelta(days=30):
+              raise SystemExit(f"security.txt expires {expires:%Y-%m-%d}; renew the Expires date")
           PY
 
           echo "security.txt looks valid"
 
-      - name: Check robots and sitemap
+  secrets:
+    name: Secret scan (full git history)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      GITLEAKS_VERSION: "8.30.1"
+      GITLEAKS_SHA256: "551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb"
+    steps:
+      - name: Checkout full history
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Install gitleaks (checksum verified)
         run: |
-          grep -q '^User-agent: \*$' robots.txt
-          grep -q '^Sitemap: https://knowledgeexcellencecpa.com/sitemap.xml$' robots.txt
+          archive="gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
+          curl --silent --show-error --fail --location --output "$RUNNER_TEMP/$archive" \
+            "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/${archive}"
+          echo "${GITLEAKS_SHA256}  $RUNNER_TEMP/$archive" | sha256sum --check --strict
+          tar -xzf "$RUNNER_TEMP/$archive" -C "$RUNNER_TEMP" gitleaks
 
-          python3 - <<'PY'
-          import xml.etree.ElementTree as ET
+      - name: Scan every commit for secrets
+        run: |
+          "$RUNNER_TEMP/gitleaks" git --config .gitleaks.toml --redact --verbose --exit-code 1 .
 
-          tree = ET.parse("sitemap.xml")
-          root = tree.getroot()
-          namespace = {"sm": "http://www.sitemaps.org/schemas/sitemap/0.9"}
-          locs = [loc.text for loc in root.findall(".//sm:loc", namespace)]
+  grammar:
+    name: Grammar (LanguageTool)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      LT_VERSION: "6.6"
+      LT_SHA256: "53600506b399bb5ffe1e4c8dec794fd378212f14aaf38ccef9b6f89314d11631"
+      LT_URL: http://127.0.0.1:8081
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
-          if "https://knowledgeexcellencecpa.com/" not in locs:
-              raise SystemExit("sitemap.xml does not include the production homepage")
-          PY
+      - name: Set up Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
 
-          echo "robots.txt and sitemap.xml look valid"
+      - name: Set up Java
+        uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Cache LanguageTool
+        id: lt-cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ runner.temp }}/LanguageTool-${{ env.LT_VERSION }}.zip
+          key: languagetool-${{ env.LT_VERSION }}-${{ env.LT_SHA256 }}
+
+      - name: Download LanguageTool
+        if: steps.lt-cache.outputs.cache-hit != 'true'
+        run: |
+          curl --silent --show-error --fail --location --output "$RUNNER_TEMP/LanguageTool-${LT_VERSION}.zip" \
+            "https://languagetool.org/download/LanguageTool-${LT_VERSION}.zip"
+
+      - name: Verify and start LanguageTool server
+        run: |
+          echo "${LT_SHA256}  $RUNNER_TEMP/LanguageTool-${LT_VERSION}.zip" | sha256sum --check --strict
+          unzip -q "$RUNNER_TEMP/LanguageTool-${LT_VERSION}.zip" -d "$RUNNER_TEMP"
+          (cd "$RUNNER_TEMP/LanguageTool-${LT_VERSION}" && \
+            nohup java -cp languagetool-server.jar org.languagetool.server.HTTPServer --port 8081 > "$RUNNER_TEMP/lt.log" 2>&1 &)
+          for _ in $(seq 1 60); do
+            curl --silent --fail "$LT_URL/v2/languages" > /dev/null && exit 0
+            sleep 2
+          done
+          cat "$RUNNER_TEMP/lt.log"
+          exit 1
+
+      - name: Check grammar of all visitor-facing copy
+        run: node scripts/check-grammar.mjs
+
+  browser:
+    name: Browser tests (desktop + phone, accessibility)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run browser tests against the production-faithful server
+        run: npm run test:e2e
+
+      - name: Upload test report
+        if: failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: playwright-report
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7
+
+  workflows:
+    name: Workflow security (actionlint + zizmor)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      ACTIONLINT_VERSION: "1.7.12"
+      ACTIONLINT_SHA256: "8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8"
+      ZIZMOR_VERSION: "1.31.1"
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Lint workflows with actionlint (checksum verified)
+        run: |
+          archive="actionlint_${ACTIONLINT_VERSION}_linux_amd64.tar.gz"
+          curl --silent --show-error --fail --location --output "$RUNNER_TEMP/$archive" \
+            "https://github.com/rhysd/actionlint/releases/download/v${ACTIONLINT_VERSION}/${archive}"
+          echo "${ACTIONLINT_SHA256}  $RUNNER_TEMP/$archive" | sha256sum --check --strict
+          tar -xzf "$RUNNER_TEMP/$archive" -C "$RUNNER_TEMP" actionlint
+          "$RUNNER_TEMP/actionlint" -color
+
+      - name: Audit workflow security with zizmor
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: pipx run "zizmor==${ZIZMOR_VERSION}" --min-severity low .github/workflows
+
+  production-smoke:
+    name: Production smoke test (after deploy)
+    needs: [static, secrets, grammar, browser, workflows]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+    # './' is the long-supported reusable-workflow form and actionlint understands it.
+    uses: ./.github/workflows/production-smoke.yml # zizmor: ignore[self-repository]
+    with:
+      wait-for-deploy: true

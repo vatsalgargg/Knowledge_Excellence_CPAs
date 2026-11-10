@@ -1,0 +1,50 @@
+{
+  "version": "0.2",
+  "language": "en-US",
+  "dictionaryDefinitions": [
+    {
+      "name": "project-words",
+      "path": "./.cspell/project-words.txt",
+      "addWords": true
+    }
+  ],
+  "dictionaries": [
+    "project-words",
+    "companies",
+    "softwareTerms",
+    "html",
+    "css",
+    "node",
+    "npm",
+    "fonts"
+  ],
+  "files": [
+    "*.html",
+    "*.md",
+    "llms.txt",
+    "*.vtt",
+    "robots.txt",
+    "*.js",
+    "scripts/**/*.{js,mjs,cjs}",
+    "tests/**/*.mjs",
+    ".github/**/*.yml",
+    "_headers",
+    "_redirects",
+    "wrangler.toml"
+  ],
+  "ignorePaths": [
+    "node_modules/**",
+    "dist/**",
+    "output/**",
+    ".qa-output/**",
+    "package-lock.json"
+  ],
+  "ignoreRegExpList": [
+    "/https?:\\/\\/[^\\s\\\"')<]+/g",
+    "/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}/g",
+    "/data:[^\\\"')\\s]+/g",
+    "/\\u[0-9a-fA-F]{4}|\\f[0-9a-f]{3}/g",
+    "/\\b[0-9a-f]{7,40}\\b/g"
+  ],
+  "minWordLength": 4
+}

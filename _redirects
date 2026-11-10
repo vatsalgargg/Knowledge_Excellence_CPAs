@@ -1,4 +1,6 @@
 /index.html / 301
+/privacy.html /privacy 301
+/terms.html /terms 301
 /favicon.ico /favicon-32.png 301
 /security.txt /.well-known/security.txt 301
 /home /#home 301

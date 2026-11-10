@@ -1,0 +1,23 @@
+[
+  {
+    "rule": "ENGLISH_WORD_REPEAT_BEGINNING_RULE",
+    "text": "Your Taxes Are Optimized. Your Strategy Is Bulletproof.",
+    "why": "Brand tagline: the repeated 'Your' is deliberate parallelism."
+  },
+  {
+    "rule": "ENGLISH_WORD_REPEAT_BEGINNING_RULE",
+    "text": "Your taxes are optimized. Your strategy is bulletproof.",
+    "why": "Brand tagline in llms.txt: the repeated 'Your' is deliberate parallelism."
+  },
+  {
+    "rule": "ENGLISH_WORD_REPEAT_BEGINNING_RULE",
+    "file": "terms.html",
+    "text": "Terms and Conditions of Service for Knowledge",
+    "why": "The page title and its meta descriptions are separate texts; the checker reads them as consecutive sentences."
+  },
+  {
+    "rule": "EN_ELLIPSIS",
+    "text": "Select a service…",
+    "why": "Standard placeholder wording for a dropdown; no space before the ellipsis is correct UI style."
+  }
+]

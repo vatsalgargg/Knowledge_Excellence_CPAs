@@ -2,15 +2,11 @@ name = 'kecpa'
 compatibility_date = "2026-04-22"
 main = "worker.js"
 
-# Static assets are served via the ASSETS binding.
-# run_worker_first = true ensures the worker script is ALWAYS invoked
-# before Cloudflare serves any static asset directly. Without this flag,
-# requests matching an asset path (e.g. "/" → index.html) bypass the worker
-# entirely, breaking Accept-header content negotiation.
+# Only homepage content negotiation needs the Worker before static assets.
 [assets]
 directory = "./"
 binding = "ASSETS"
-run_worker_first = true
+run_worker_first = ["/", "/index", "/index.html"]
 
 # Keep only explicit, redacted application errors; invocation logs contain URLs.
 [observability.logs]

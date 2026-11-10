@@ -1,0 +1,8 @@
+# gitleaks: all built-in rules, no exceptions.
+# If a finding is a false positive, add the narrowest possible [[allowlists]]
+# entry here with a comment explaining why. A real secret must be rotated
+# immediately; removing it from git history alone is not enough.
+title = "KECPA secret scan"
+
+[extend]
+useDefault = true

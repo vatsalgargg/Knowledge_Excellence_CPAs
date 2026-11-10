@@ -1,0 +1,62 @@
+# Words cspell should accept. Add a word only after confirming it is spelled correctly.
+
+# Company, people, places
+Bengaluru
+Garg
+Karnataka
+KECPA
+Vatsal
+
+# Accounting and business terms
+Financials
+GAAP
+IFRS
+rightshore
+rightshored
+rightshoring
+rightsourcing
+workpaper
+
+# Web and product terms
+assetsignore
+autoplays
+crossfades
+Formspree
+WCAG
+geolocation
+HSTS
+knowledgeexcellencecpa
+letterform
+llms
+networkidle
+nosniff
+Preconnects
+WEBVTT
+wordmark
+
+# Code vocabulary (shell, Python, tests, secret-scan patterns)
+abposr
+AKIA
+bxox
+esac
+etree
+findall
+fromisoformat
+getroot
+mktemp
+passw
+pousr
+tolower
+unreviewed
+
+# CI tooling
+htmlvalidate
+languagetool
+MORFOLOGIK
+nohup
+pipx
+redirs
+requestfailed
+temurin
+timedelta
+zizmor

@@ -296,12 +296,6 @@ document.addEventListener('DOMContentLoaded', () => {
   scheduleMotion();
 
 
-  // VISITOR BADGE — src set via JS to avoid HTML & encoding issues; extraCount seeds from 1000
-  const badge = document.getElementById('visitorBadge');
-  if (badge) {
-    badge.src = 'https://hits.sh/knowledgeexcellencecpa.com.svg?style=flat&label=Visitors&color=b8860b&labelColor=0a1628&extraCount=1000';
-  }
-
   // 6. SCROLL TO TOP
   document.getElementById('scrollTop')?.addEventListener('click', (e) => {
     e.preventDefault();
@@ -472,9 +466,14 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ── PARTNER PASS POPUP ────────────────────────────────────────────────────
-  // Outreach to CPA firms outside India. Opens on every page load, including refreshes.
-  // Nothing is stored; the typed firm name never leaves the page unless the visitor
-  // submits the contact form themselves.
+  // Outreach to CPA firms outside India. It never covers the page on arrival (Google's
+  // intrusive-interstitial guidance, and it would otherwise become the page's Largest
+  // Contentful Paint). It opens on its own at most once per browser session, and only
+  // after the visitor engages: scrolling halfway down the page, or spending 20 s on the
+  // page and then interacting. On phones it never opens on its own on the first page
+  // view of a session. The reopen tab lets anyone open it at any time.
+  // sessionStorage holds only "already shown" and a page-view count; the typed firm name
+  // is never stored and never leaves the page unless the visitor submits the contact form.
   const pp = document.getElementById('partnerPass');
   if (pp && typeof pp.showModal === 'function') {
     const swing = document.getElementById('ppSwing');
@@ -487,6 +486,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const reopen = document.getElementById('ppReopen');
     const stage = pp.querySelector('.pp-stage');
     let lastFocus = null;
+    let passOpened = false;
+
+    // sessionStorage can be missing or throw (private mode, blocked site data).
+    const PASS_SHOWN_KEY = 'kecpa:partner-pass';
+    const PAGE_VIEWS_KEY = 'kecpa:page-views';
+    const recall = key => { try { return sessionStorage.getItem(key); } catch { return null; } };
+    const remember = (key, value) => { try { sessionStorage.setItem(key, value); } catch { /* not persisted */ } };
 
     // Damped pendulum: runs only while the badge is moving, then stops its frame loop.
     let angle = 0, velocity = 0, swingFrame = 0, lastTick = 0;
@@ -519,7 +525,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     pp.querySelector('.pp-hang').addEventListener('pointerdown', () => nudge(angle >= 0 ? -60 : 60));
 
-    // Live badge personalisation (textContent only).
+    // Live badge personalization (textContent only).
     const cleanFirm = value => value.replace(/[^\p{L}\p{N} &.,'-]/gu, '').replace(/\s+/g, ' ').trim().slice(0, 48);
     function renderBadge() {
       const firm = cleanFirm(firmInput.value);
@@ -542,6 +548,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function openPass() {
       if (pp.open) return;
+      passOpened = true;
       lastFocus = document.activeElement;
       setMenu(false);
       reopen.hidden = true;
@@ -561,6 +568,7 @@ document.addEventListener('DOMContentLoaded', () => {
         cancelAnimationFrame(swingFrame);
         swingFrame = 0;
         reopen.hidden = kind === 'claimed';
+        remember(PASS_SHOWN_KEY, kind);
         if (kind !== 'claimed') lastFocus?.focus?.({ preventScroll: true });
       };
       if (motionPreference.matches) return finish();
@@ -597,8 +605,54 @@ document.addEventListener('DOMContentLoaded', () => {
       }, motionPreference.matches ? 0 : 340);
     });
 
-    // Open right after the page loader fades, on every load.
-    setTimeout(openPass, 600);
+    // ── Auto-open on engagement, once per session ──
+    const AUTO_OPEN_SCROLL = 0.5;      // fraction of the scrollable page
+    const AUTO_OPEN_DELAY = 20_000;    // ms on the page before an interaction may open it
+    const isPhone = window.matchMedia('(max-width: 760px)').matches;
+    const pageViews = Number(recall(PAGE_VIEWS_KEY) || 0) + 1;
+    remember(PAGE_VIEWS_KEY, String(pageViews));
+    const alreadyShown = recall(PASS_SHOWN_KEY);
+
+    if (alreadyShown || (isPhone && pageViews === 1)) {
+      // No auto-open on this view; offer the tab instead (unless they already claimed it).
+      reopen.hidden = alreadyShown === 'claimed';
+    } else {
+      const INPUT_EVENTS = ['pointerdown', 'wheel', 'touchstart', 'keydown'];
+      let timeUp = false;
+      let interacted = false;
+      const busy = () => document.querySelector('dialog[open]')
+        || document.getElementById('navLinks')?.classList.contains('open')
+        || document.activeElement?.matches?.('input, textarea, select');
+      const scrolledFar = () => {
+        const scrollable = document.documentElement.scrollHeight - innerHeight;
+        return scrollable > 0 && scrollY / scrollable >= AUTO_OPEN_SCROLL;
+      };
+      const stop = () => {
+        clearTimeout(timer);
+        removeEventListener('scroll', onScroll);
+        INPUT_EVENTS.forEach(type => removeEventListener(type, onInteract));
+      };
+      const tryOpen = () => {
+        if (passOpened) return stop(); // already opened from the reopen tab
+        if (busy()) return;
+        stop();
+        remember(PASS_SHOWN_KEY, 'shown');
+        openPass();
+      };
+      // Only scrolling the visitor does counts: anchor jumps and scroll restoration also
+      // fire scroll events. Any real input also ends LCP measurement, so the pass can
+      // never be recorded as the page's largest paint.
+      function onScroll() {
+        if (interacted && (scrolledFar() || timeUp)) tryOpen();
+      }
+      function onInteract() { interacted = true; }
+      const timer = setTimeout(() => {
+        timeUp = true;
+        if (interacted) tryOpen();
+      }, AUTO_OPEN_DELAY);
+      addEventListener('scroll', onScroll, { passive: true });
+      INPUT_EVENTS.forEach(type => addEventListener(type, onInteract, { passive: true }));
+    }
   }
 
   // Log unhandled JS errors (unusual JS exceptions may indicate tampering)

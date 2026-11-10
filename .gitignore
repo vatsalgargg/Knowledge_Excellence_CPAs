@@ -22,3 +22,8 @@ node_modules/
 dist/
 .dist/
 .qa-output/
+
+# Test output
+test-results/
+playwright-report/
+blob-report/
