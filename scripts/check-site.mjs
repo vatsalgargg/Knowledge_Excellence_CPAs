@@ -175,7 +175,15 @@ if (!/^Sitemap: https:\/\/knowledgeexcellencecpa\.com\/sitemap\.xml$/m.test(text
 
 // ── Optional: outbound links ─────────────────────────────────────────────────
 if (process.argv.includes('--external')) {
+  // These sites refuse every automated request (LinkedIn answers bots with 403 or 999),
+  // so a status from them says nothing about whether the link works. Only check the
+  // URL is well formed; verify these by hand when they change.
+  const BOT_BLOCKING_HOSTS = new Set(['www.linkedin.com', 'linkedin.com']);
   for (const url of [...external].sort()) {
+    if (BOT_BLOCKING_HOSTS.has(new URL(url).hostname)) {
+      console.log(`  skipped ${url} (site blocks automated link checks)`);
+      continue;
+    }
     try {
       const res = await fetch(url, { method: 'GET', redirect: 'follow', signal: AbortSignal.timeout(15000), headers: { 'User-Agent': 'KECPA link checker' } });
       if (res.status >= 400) fail('external', `${url} returned ${res.status}`);
