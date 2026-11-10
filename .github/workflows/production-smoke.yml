@@ -55,9 +55,9 @@ jobs:
             # cf-mitigated / a "Just a moment" body mean Cloudflare challenged the runner.
             server=$(grep -i '^server:' "$headers" | tail -1 | tr -d '\r')
             mitigated=$(grep -i '^cf-mitigated:' "$headers" | tail -1 | tr -d '\r')
-            ctype=$(grep -i '^content-type:' "$headers" | tail -1 | tr -d '\r')
+            content_type=$(grep -i '^content-type:' "$headers" | tail -1 | tr -d '\r')
             title=$(grep -o '<title>[^<]*' "$body" | head -1 | cut -c8-80)
-            echo "::error title=Homepage smoke check::HTTP $status; missing:${missing:- none}; $server; ${mitigated:-no cf-mitigated}; $ctype; title: ${title:-none}"
+            echo "::error title=Homepage smoke check::HTTP $status; missing:${missing:- none}; $server; ${mitigated:-no cf-mitigated}; $content_type; title: ${title:-none}"
             cat "$headers"
             exit 1
           fi
