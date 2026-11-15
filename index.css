@@ -560,7 +560,7 @@ a,button {
   color: var(--copper);
   margin-bottom: 10px;
 }
-.about-feature h4 {
+.about-feature h3 {
   font-size: 12px;
   font-weight: 600;
   margin-bottom: 6px;
@@ -1072,7 +1072,7 @@ a,button {
 .stat-label {
   font-size: 12px;
 }
-.about-feature h4 {
+.about-feature h3 {
   font-size: 14px;
 }
 .about-feature p {
