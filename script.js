@@ -160,12 +160,10 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // 3. SCROLL REVEAL
-  // Native scroll: photo parallax, pinned service photos and finite reveals.
+  // Native scroll: pinned service photos and finite reveals.
   const motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
-  const heroPhoto = document.querySelector('.hero-photo');
   const servicePhotos = [...document.querySelectorAll('.service-photo')];
   const serviceIndex = document.querySelector('.service-photo-index');
-  const hero = document.querySelector('.hero');
 
   const cards = [...document.querySelectorAll('.service-card')];
   const processSteps = [...document.querySelectorAll('.process-step')];
@@ -242,7 +240,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const height = window.innerHeight;
     const reduced = motionPreference.matches;
     const desktop = window.innerWidth > 760;
-    const heroRect = hero.getBoundingClientRect();
     const processRect = process.getBoundingClientRect();
 
     const cardRects = cardLayout.map(rect => ({ top: rect.top - window.scrollY, bottom: rect.top + rect.height - window.scrollY }));
@@ -260,13 +257,8 @@ document.addEventListener('DOMContentLoaded', () => {
     serviceIndex.textContent = `0${activeService + 1} / 05`;
     if (reduced) {
       revealAnimations.forEach(animation => animation.cancel());
-      heroPhoto.style.transform = '';
       [...cards, ...processSteps].forEach(el => el.style.transform = '');
       return;
-    }
-    if (heroRect.bottom > 0) {
-      const p = clamp(-heroRect.top / heroRect.height);
-      heroPhoto.style.transform = desktop ? `scale(${1.08 + p * .1}) translateY(${p * 5}%)` : '';
     }
     // Phone cards use only the one-time reveal, not a second scroll transform.
     if (!desktop) {
@@ -587,7 +579,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (event.target === stage || event.target.classList.contains('pp-grid')) closePass();
     });
     reopen.addEventListener('click', openPass);
-    // Keep the reopen tab off the hero, where it would cover the trust badges.
+    // Keep the reopen tab off the hero, where it would cover the hero actions.
     const placeReopen = () => reopen.classList.toggle('is-away', scrollY < innerHeight * 0.7);
     addEventListener('scroll', placeReopen, { passive: true });
     placeReopen();
