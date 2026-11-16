@@ -74,7 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // ── Field Validators ──────────────────────────────────────────────────────
   // Each returns null if valid, or an error string if invalid.
   const ALLOWED_SERVICES = [
-    '', 'Financial Accounting & Reporting', 'Tax Preparation & Planning',
+    '', 'Financial Accounting & Reporting', 'Tax Preparation, Advisory & Planning',
     'Audit Support & Compliance', 'Bookkeeping & Payroll', 'Virtual CFO & Advisory'
   ];
 
@@ -348,7 +348,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (hasError) {
         secLog.warn('VALIDATION_FAILED', { fields: Object.keys(fields) });
         submitBtn.disabled = false;
-        submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Send Message';
+        submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Send message';
         contactForm.querySelector('[aria-invalid="true"]')?.focus();
         return;
       }
@@ -388,7 +388,7 @@ document.addEventListener('DOMContentLoaded', () => {
         formStatus.textContent = '❌ Network error. Please email us directly.';
       } finally {
         submitBtn.disabled = false;
-        submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Send Message';
+        submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Send message';
       }
     });
   }
